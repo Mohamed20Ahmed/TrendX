@@ -1,10 +1,17 @@
-const { sendErrorResponse } = require("../utils/responseHandler");
+const {
+  sendFailResponse,
+  sendErrorResponse,
+} = require("../utils/responseHandler");
 
 const errorMiddleware = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
-  sendErrorResponse(res, err);
+  if (err.status === "fail") {
+    sendFailResponse(res, err.message, err.statusCode);
+  } else {
+    sendErrorResponse(res, err.message, err.statusCode);
+  }
 };
 
 module.exports = errorMiddleware;

@@ -1,6 +1,6 @@
-const { sendSuccessResponse } = require("../utils/responseHandler");
-const ApiError = require("../utils/apiError");
 const userRoute = require("./userRoute");
+const ApiError = require("../utils/apiError");
+const { sendSuccessResponse } = require("../utils/responseHandler");
 
 const mountRoutes = (app) => {
   app.use("/users", userRoute);

@@ -1,7 +1,12 @@
 const router = require("express").Router();
-const { addUser } = require("../controllers/userController");
+
+const {
+  uploadShopImage,
+  resizeImage,
+  addUser,
+} = require("../controllers/userController");
 const { addUserValidator } = require("../validators/userValidator");
 
-router.route("/").post(addUserValidator, addUser);
+router.route("/").post(uploadShopImage, resizeImage, addUser);
 
 module.exports = router;

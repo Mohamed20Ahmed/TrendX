@@ -2,8 +2,12 @@ const sendSuccessResponse = (res, resData, statusCode = 200) => {
   res.status(statusCode).json({ status: "success", data: resData });
 };
 
-const sendErrorResponse = (res, err) => {
-  res.status(err.statusCode).json({ status: err.status, message: err.message });
+const sendFailResponse = (res, resMessage, statusCode = 400) => {
+  res.status(statusCode).json({ status: "fail", message: resMessage });
 };
 
-module.exports = { sendSuccessResponse, sendErrorResponse };
+const sendErrorResponse = (res, resMessage, statusCode = 500) => {
+  res.status(statusCode).json({ status: "error", message: resMessage });
+};
+
+module.exports = { sendSuccessResponse, sendFailResponse, sendErrorResponse };

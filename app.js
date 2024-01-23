@@ -1,14 +1,17 @@
-const dbConnection = require("./config/database");
-const mountRoutes = require("./routes");
-const errorMiddleware = require("./middlewares/errorMiddleware");
+// Core modules
+const path = require("path");
 
-// Modules
+// Third-Party modules
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
 
-// Required Modules
+// Import
+const dbConnection = require("./config/database");
+const mountRoutes = require("./routes");
+const errorMiddleware = require("./middlewares/errorMiddleware");
+
 dotenv.config();
 
 // Database connection
@@ -23,6 +26,8 @@ app.options("*", cors());
 
 // Middlewares
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, "uploads")));
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
