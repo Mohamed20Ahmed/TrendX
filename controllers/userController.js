@@ -2,12 +2,17 @@ const asyncHandler = require("express-async-handler");
 const uuid = require("uuid");
 const sharp = require("sharp");
 
+const {
+  getUserByIdDB,
+  getUserDB,
+  getUsersByRoleDB,
+  updateUserDB,
+  deleteUserDB,
+} = require("../database/userDB");
 const { hash, compare } = require("../utils/bcryptService");
-const userModel = require("../models/userModel");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const ApiError = require("../utils/apiError");
-const ApiFeatures = require("../utils/apiFeatures");
 
 // Upload shop image
 const uploadShopImage = uploadSingleImage("shopImage");
@@ -25,7 +30,6 @@ const resizeImage = asyncHandler(async (req, res, next) => {
 
     req.body.shopImage = fileName;
   }
-
   next();
 });
 
@@ -35,9 +39,10 @@ const getCustomer_S = asyncHandler(async (req, res, next) => {
   // get specific customer
 
   if (req.query.email) {
-    const customer = await userModel
-      .findOne({ email: req.query.email })
-      .select(customerExcludedFields);
+    const customer = await getUserDB(
+      { email: req.query.email, role: "customer" },
+      customerExcludedFields
+    );
 
     if (!customer) {
       return next(new ApiError("customer not found", 404));
@@ -48,30 +53,9 @@ const getCustomer_S = asyncHandler(async (req, res, next) => {
 
   // get all customers
 
-  req.query.fields = customerExcludedFields;
+  req.query.fields = req.query.fields || customerExcludedFields;
 
-  // get count of customers to use it in pagination results
-  const documentsCounts = await userModel
-    .find({ role: "customer" })
-    .countDocuments();
-
-  // apply api features
-  const apiFeatures = new ApiFeatures(
-    userModel.find({ role: "customer" }),
-    req.query
-  )
-    .paginate(documentsCounts)
-    .filter()
-    .search("users")
-    .limitFields()
-    .sort();
-
-  // result from api features
-  const { mongooseQuery, paginationResult } = apiFeatures;
-
-  const customers = await mongooseQuery;
-
-  const response = { paginationResult, customers };
+  const response = await getUsersByRoleDB("customer", req);
 
   sendSuccessResponse(res, response, 200);
 });
@@ -82,9 +66,10 @@ const getSeller_S = asyncHandler(async (req, res, next) => {
   // get specific seller
 
   if (req.query.email) {
-    const seller = await userModel
-      .findOne({ email: req.query.email })
-      .select(sellerExcludedFields);
+    const seller = await getUserDB(
+      { email: req.query.email, role: "seller" },
+      sellerExcludedFields
+    );
 
     if (!seller) {
       return next(new ApiError("seller not found", 404));
@@ -94,31 +79,9 @@ const getSeller_S = asyncHandler(async (req, res, next) => {
   }
 
   // get all sellers
+  req.query.fields = req.query.fields || sellerExcludedFields;
 
-  req.query.fields = sellerExcludedFields;
-
-  // get count of sellers to use it in pagination results
-  const documentsCounts = await userModel
-    .find({ role: "seller" })
-    .countDocuments();
-
-  // apply api features
-  const apiFeatures = new ApiFeatures(
-    userModel.find({ role: "seller" }),
-    req.query
-  )
-    .paginate(documentsCounts)
-    .filter()
-    .search("users")
-    .limitFields()
-    .sort();
-
-  // result from api features
-  const { mongooseQuery, paginationResult } = apiFeatures;
-
-  const sellers = await mongooseQuery;
-
-  const response = { paginationResult, sellers };
+  const response = await getUsersByRoleDB("seller", req);
 
   sendSuccessResponse(res, response, 200);
 });
@@ -126,7 +89,7 @@ const getSeller_S = asyncHandler(async (req, res, next) => {
 const getUserAccount = asyncHandler(async (req, res, next) => {
   const excludedFields = "-password -__v";
 
-  const user = await userModel.findById(req.user.id).select(excludedFields);
+  const user = await getUserByIdDB(req.user.id, excludedFields);
 
   if (!user) {
     return next(new ApiError("user not found"));
@@ -143,7 +106,7 @@ const updateStatus = asyncHandler(async (req, res, next) => {
     return next(new ApiError("user email is required"));
   }
 
-  const user = await userModel.findOneAndUpdate({ email }, { active });
+  const user = await updateUserDB({ email }, { active });
 
   if (!user) {
     return next(new ApiError("user not found"));
@@ -158,13 +121,13 @@ const deleteUser = asyncHandler(async (req, res, next) => {
   const email = req.params.email;
 
   if (!email) {
-    return next(new ApiError("user email is required"));
+    return next(new ApiError("user email is required", 400));
   }
 
-  const user = await userModel.findOneAndDelete({ email });
+  const user = await deleteUserDB({ email });
 
   if (!user) {
-    return next(new ApiError("user not found"));
+    return next(new ApiError("user not found", 404));
   }
 
   const response = { message: "user deleted successfully" };
@@ -175,24 +138,16 @@ const deleteUser = asyncHandler(async (req, res, next) => {
 const updateCustomerAccount = asyncHandler(async (req, res, next) => {
   const { name, slug, email, phoneNumber, address } = req.body;
 
-  if (email) {
-    const emailExistence = await userModel.findOne({ email }).email;
-
-    // check if email not exists in database
-    if (emailExistence && emailExistence != req.user.email) {
-      return next(new ApiError("email already exists", 400));
-    }
-  }
+  await uniqueFieldsExistence(
+    { email: req.user.email, phoneNumber: req.user.phoneNumber },
+    { email, phoneNumber }
+  );
 
   // Update customer information
-  const customer = await userModel.findOneAndUpdate(
+  await updateUserDB(
     { _id: req.user._id },
     { name, slug, email, phoneNumber, address }
   );
-
-  if (!customer) {
-    return next(new ApiError("Customer not found"));
-  }
 
   const response = { message: "Customer updated successfully" };
 
@@ -211,17 +166,17 @@ const updateSellerAccount = asyncHandler(async (req, res, next) => {
     shopImage,
   } = req.body;
 
-  if (email) {
-    const emailExistence = await userModel.findOne({ email }).email;
-
-    // Check if email not exists in database
-    if (emailExistence && emailExistence != req.user.email) {
-      return next(new ApiError("email already exists", 400));
-    }
-  }
+  await uniqueFieldsExistence(
+    {
+      email: req.user.email,
+      phoneNumber: req.user.phoneNumber,
+      shopName: req.user.shopName,
+    },
+    { email, phoneNumber, shopName }
+  );
 
   // Update seller information
-  const seller = await userModel.findOneAndUpdate(
+  await updateUserDB(
     { _id: req.user._id },
     {
       name,
@@ -235,10 +190,6 @@ const updateSellerAccount = asyncHandler(async (req, res, next) => {
     }
   );
 
-  if (!seller) {
-    return next(new ApiError("Seller not found"));
-  }
-
   const response = { message: "Seller updated successfully" };
 
   sendSuccessResponse(res, response, 200);
@@ -247,15 +198,12 @@ const updateSellerAccount = asyncHandler(async (req, res, next) => {
 const updateAdminAccount = asyncHandler(async (req, res, next) => {
   const { name, slug, email, phoneNumber } = req.body;
 
-  if (email) {
-    const emailExistence = await userModel.findOne({ email }).email;
+  await uniqueFieldsExistence(
+    { email: req.user.email, phoneNumber: req.user.phoneNumber },
+    { email, phoneNumber }
+  );
 
-    if (emailExistence && emailExistence != req.user.email) {
-      return next(new ApiError("Email already exists", 400));
-    }
-  }
-
-  const admin = await userModel.findOneAndUpdate(
+  await updateUserDB(
     { _id: req.user._id },
     {
       name,
@@ -264,10 +212,6 @@ const updateAdminAccount = asyncHandler(async (req, res, next) => {
       phoneNumber,
     }
   );
-
-  if (!admin) {
-    return next(new ApiError("Admin not found"));
-  }
 
   const response = { message: "Admin updated successfully" };
 
@@ -283,13 +227,41 @@ const changePassword = asyncHandler(async (req, res, next) => {
 
   const hashedPassword = await hash(newPassword);
 
-  await userModel.findOneAndUpdate(
-    { _id: req.user._id },
-    { password: hashedPassword }
-  );
+  await updateUserDB({ _id: req.user._id }, { password: hashedPassword });
 
   sendSuccessResponse(res, "Password updated successfully", 200);
 });
+
+const uniqueFieldsExistence = async (userData, fields) => {
+  if (fields.email) {
+    const emailExistence = await getUserDB({ email: fields.email });
+
+    // check if email not exists in database
+    if (emailExistence && emailExistence != userData.email) {
+      throw new ApiError("email already exists", 400);
+    }
+  }
+
+  if (fields.phoneNumber) {
+    const phoneNumberExistence = await getUserDB({
+      phoneNumber: fields.phoneNumber,
+    });
+
+    // check if phoneNumber not exists in database
+    if (phoneNumberExistence && phoneNumberExistence != userData.phoneNumber) {
+      throw new ApiError("phoneNumber already exists", 400);
+    }
+  }
+
+  if (fields.shopName) {
+    const shopNameExistence = await getUserDB({ shopName: fields.shopName });
+
+    // check if phoneNumber not exists in database
+    if (shopNameExistence && shopNameExistence != userData.shopName) {
+      throw new ApiError("shopName already exists", 400);
+    }
+  }
+};
 
 module.exports = {
   uploadShopImage,

@@ -8,7 +8,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 
 // Import
-const dbConnection = require("./config/database");
+const dbConnection = require("./database/dbConfig");
 const mountRoutes = require("./routes");
 const errorMiddleware = require("./middlewares/errorMiddleware");
 
