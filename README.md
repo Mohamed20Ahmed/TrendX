@@ -23,6 +23,6 @@
 
 ## Users accounts for testing purposes:
 
-email: admin@gmail.com | password: admin123
-email: customer@gmail.com | password: customer
-email: seller@gmail.com | password: seller12
+- email: admin@gmail.com | password: admin123
+- email: customer@gmail.com | password: customer
+- email: seller@gmail.com | password: seller12
