@@ -1,8 +1,10 @@
 const userRoute = require("./userRoute");
+const authRoute = require("./authRoute");
 const ApiError = require("../utils/apiError");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 
 const mountRoutes = (app) => {
+  app.use("/auth", authRoute);
   app.use("/users", userRoute);
 
   app.get("/", (req, res) => {

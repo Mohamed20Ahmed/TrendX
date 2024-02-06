@@ -22,4 +22,5 @@ const uploadSingleImage = (fieldName) => multerOptions().single(fieldName);
 
 const uploadMixOfImages = (arrayOfFields) =>
   multerOptions().fields(arrayOfFields);
+
 module.exports = { uploadSingleImage, uploadMixOfImages };
