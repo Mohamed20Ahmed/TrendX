@@ -237,7 +237,7 @@ const uniqueFieldsExistence = async (userData, fields) => {
     const emailExistence = await getUserDB({ email: fields.email });
 
     // check if email not exists in database
-    if (emailExistence && emailExistence != userData.email) {
+    if (emailExistence && emailExistence.email != userData.email) {
       throw new ApiError("email already exists", 400);
     }
   }
@@ -248,7 +248,10 @@ const uniqueFieldsExistence = async (userData, fields) => {
     });
 
     // check if phoneNumber not exists in database
-    if (phoneNumberExistence && phoneNumberExistence != userData.phoneNumber) {
+    if (
+      phoneNumberExistence &&
+      phoneNumberExistence.phoneNumber != userData.phoneNumber
+    ) {
       throw new ApiError("phoneNumber already exists", 400);
     }
   }
@@ -257,7 +260,7 @@ const uniqueFieldsExistence = async (userData, fields) => {
     const shopNameExistence = await getUserDB({ shopName: fields.shopName });
 
     // check if phoneNumber not exists in database
-    if (shopNameExistence && shopNameExistence != userData.shopName) {
+    if (shopNameExistence && shopNameExistence.shopName != userData.shopName) {
       throw new ApiError("shopName already exists", 400);
     }
   }
