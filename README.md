@@ -4,8 +4,8 @@
 
 ### Done:
 
-- Login (Customer, Seller and Admin)
-- Logout (Customer, Seller and Admin)
+[x] Login (Customer, Seller and Admin)
+[ ] Logout (Customer, Seller and Admin)
 - Register as Customer (Customer)
 - Register as Seller (Seller)
 - Manage Account Information (Customer and Seller)
