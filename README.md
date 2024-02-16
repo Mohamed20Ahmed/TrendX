@@ -1,16 +1,16 @@
 # TrendX
 
-## Mohammed's Task:
+### Mohammed's Task:
 
-### Done:
-- [x] #739 Login (Customer, Seller and Admin)
-- [ ] Logout (Customer, Seller and Admin)
+#### Done:
+- Login (Customer, Seller and Admin)
+- Logout (Customer, Seller and Admin)
 - Register as Customer (Customer)
 - Register as Seller (Seller)
 - Manage Account Information (Customer and Seller)
 - Manage User Accounts (Admin)
 
-### Remaining:
+#### Remaining:
 
 - Reset Password (Customer, Seller and Admin)
 - Renew Monthly Subscription (Seller)
