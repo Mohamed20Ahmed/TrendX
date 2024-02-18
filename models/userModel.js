@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema(
 
     phoneNumber: String,
 
+    passwordChangedAt: Date,
+    passwordResetCode: String,
+    passwordResetExpires: Date,
+    passwordResetVerified: Boolean,
+
     role: {
       type: String,
       enum: ["customer", "seller", "admin"],
@@ -37,8 +42,6 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-
-    creditCard: String,
 
     address: String,
 

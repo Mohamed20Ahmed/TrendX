@@ -9,7 +9,6 @@ const updateCustomerValidator = [
     .notEmpty()
     .withMessage("Please enter your name")
     .custom((value, { req }) => {
-      console.log(value);
       req.body.slug = slugify(value);
       return true;
     }),
@@ -42,7 +41,6 @@ const updateSellerValidator = [
     .notEmpty()
     .withMessage("Please enter your name")
     .custom((value, { req }) => {
-      console.log(value);
       req.body.slug = slugify(value);
       return true;
     }),
@@ -65,13 +63,6 @@ const updateSellerValidator = [
     .optional()
     .notEmpty()
     .withMessage("Please enter your address"),
-
-  body("creditCard")
-    .optional()
-    .notEmpty()
-    .withMessage("Please enter your credit card")
-    .isCreditCard()
-    .withMessage("Please enter a valid credit card number"),
 
   body("shopName")
     .optional()

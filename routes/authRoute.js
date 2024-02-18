@@ -4,11 +4,17 @@ const {
   registerAsCustomerValidator,
   registerAsSellerValidator,
   loginValidator,
+  forgotPasswordValidator,
+  verifyResetCodeValidator,
+  resetPasswordValidator,
 } = require("../validators/authValidator");
 const {
   registerAsCustomer,
   registerAsSeller,
   login,
+  forgotPassword,
+  verifyResetCode,
+  resetPassword,
 } = require("../controllers/authController");
 const {
   uploadShopImage,
@@ -30,5 +36,11 @@ router.post(
 );
 
 router.post("/login", loginValidator, login);
+
+router.post("/forgotPassword", forgotPasswordValidator, forgotPassword);
+
+router.post("/verifyResetCode", verifyResetCodeValidator, verifyResetCode);
+
+router.patch("/resetPassword", resetPasswordValidator, resetPassword);
 
 module.exports = router;

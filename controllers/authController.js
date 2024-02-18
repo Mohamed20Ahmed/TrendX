@@ -2,6 +2,8 @@ const asyncHandler = require("express-async-handler");
 
 const { getUserDB, createUserDB } = require("../database/userDB");
 const { hash, compare } = require("../utils/bcryptService");
+const { createHash } = require("../utils/cryptoService");
+const { sendEmail } = require("../utils/emailService");
 const { jwtGenerator } = require("../utils/jwtService");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const ApiError = require("../utils/apiError");
@@ -51,7 +53,6 @@ const registerAsSeller = asyncHandler(async (req, res, next) => {
     password: req.body.password,
     phoneNumber: req.body.phoneNumber,
     address: req.body.address,
-    creditCard: req.body.creditCard,
     shopName: req.body.shopName,
     shopImage: req.body.shopImage,
     role: "seller",
@@ -84,6 +85,100 @@ const login = asyncHandler(async (req, res, next) => {
       new ApiError("You are blocked from accessing this account", 400)
     );
   }
+
+  const token = await jwtGenerator({
+    email: user.email,
+    id: user._id,
+    role: user.role,
+  });
+
+  sendSuccessResponse(res, { token }, 200);
+});
+
+const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await getUserDB({ email });
+
+  if (!user) {
+    return next(new ApiError("User not found", 404));
+  }
+
+  // generate reset code
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedResetCode = createHash(resetCode);
+  user.passwordResetCode = hashedResetCode;
+
+  // reset code expiration
+  const tenMinutes = 10 * 60 * 1000;
+  user.passwordResetExpires = Date.now() + tenMinutes;
+
+  user.passwordResetVerified = false;
+
+  await user.save();
+
+  const message = `Hi ${user.name}, We received a request to reset the password on your TrendX Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The TrendX Team`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Your password reset code (valid for 10 min)",
+      message,
+    });
+  } catch (err) {
+    user.passwordResetCode = undefined;
+    user.passwordResetExpires = undefined;
+    user.passwordResetVerified = undefined;
+
+    console.log(err);
+
+    await user.save();
+    return next(new ApiError("There is an error in sending email", 500));
+  }
+
+  sendSuccessResponse(res, "Reset code sent to your email", 200);
+});
+
+const verifyResetCode = asyncHandler(async (req, res, next) => {
+  const { email, resetCode } = req.body;
+
+  const hashedResetCode = createHash(resetCode);
+
+  const user = await getUserDB({
+    email,
+    passwordResetCode: hashedResetCode,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ApiError("invalid or expired code"));
+  }
+
+  user.passwordResetVerified = true;
+  await user.save();
+
+  sendSuccessResponse(res, "Success", 200);
+});
+
+const resetPassword = asyncHandler(async (req, res, next) => {
+  const { email, newPassword } = req.body;
+
+  const user = await getUserDB({ email });
+
+  if (!user) {
+    return next(new ApiError("User not found", 404));
+  }
+
+  if (!user.passwordResetVerified) {
+    return next(new ApiError("Reset code not verified", 400));
+  }
+
+  user.password = newPassword;
+  user.passwordResetCode = undefined;
+  user.passwordResetExpires = undefined;
+  user.passwordResetVerified = undefined;
+
+  await user.save();
 
   const token = await jwtGenerator({
     email: user.email,
@@ -128,4 +223,7 @@ module.exports = {
   registerAsCustomer,
   registerAsSeller,
   login,
+  forgotPassword,
+  verifyResetCode,
+  resetPassword,
 };

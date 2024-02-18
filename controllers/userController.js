@@ -227,7 +227,10 @@ const changePassword = asyncHandler(async (req, res, next) => {
 
   const hashedPassword = await hash(newPassword);
 
-  await updateUserDB({ _id: req.user._id }, { password: hashedPassword });
+  await updateUserDB(
+    { _id: req.user._id },
+    { password: hashedPassword, passwordChangedAt: Date.now() }
+  );
 
   sendSuccessResponse(res, "Password updated successfully", 200);
 });
