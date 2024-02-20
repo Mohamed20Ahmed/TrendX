@@ -33,52 +33,6 @@ const getUsersByRoleDB = async (role, req) => {
   return { paginationResult, users };
 };
 
-// const getCustomersDB = async (req) => {
-//   // get count of customers to use it in pagination results
-//   const documentsCounts = await getCountOfDocument({ role: "customer" });
-
-//   // apply api features
-//   const apiFeatures = new ApiFeatures(
-//     userModel.find({ role: "customer" }),
-//     req.query
-//   )
-//     .paginate(documentsCounts)
-//     .filter()
-//     .search("users")
-//     .limitFields()
-//     .sort();
-
-//   // result from api features
-//   const { mongooseQuery, paginationResult } = apiFeatures;
-
-//   const customers = await mongooseQuery;
-
-//   return { paginationResult, customers };
-// };
-
-// const getSellersDB = async (req) => {
-//   // get count of sellers to use it in pagination results
-//   const documentsCounts = await getCountOfDocument({ role: "seller" });
-
-//   // apply api features
-//   const apiFeatures = new ApiFeatures(
-//     userModel.find({ role: "seller" }),
-//     req.query
-//   )
-//     .paginate(documentsCounts)
-//     .filter()
-//     .search("users")
-//     .limitFields()
-//     .sort();
-
-//   // result from api features
-//   const { mongooseQuery, paginationResult } = apiFeatures;
-
-//   const sellers = await mongooseQuery;
-
-//   return { paginationResult, sellers };
-// };
-
 const createUserDB = async (data) => {
   return await userModel.create(data);
 };
