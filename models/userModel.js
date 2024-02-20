@@ -49,7 +49,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-
     shopImage: String,
   },
   { timestamps: true }

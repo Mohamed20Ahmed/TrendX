@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
-
 const orderSchema = new mongoose.Schema(
   {
-    user: {
+    seller:{
+       type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: [true, 'products must be produced by seller'],
+    },
+    customer: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      required: [true, 'Order must be belong to user'],
+      required: [true, 'Order must be belong to customer'],
     },
     cartItems: [
       {
@@ -35,33 +39,36 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethodType: {
       type: String,
-      enum: ['card', 'cash'],
       default: 'cash',
     },
-    isPaid: {
-      type: Boolean,
-      default: false,
-    },
-
-    paidAt: Date,
-
-    isDelivered: {
-      type: Boolean,
-      default: false,
-    },
-    deliveredAt: Date,
+   status: {
+    type: String,
+    default: 'pending',
+    enum: [
+      'pending',
+      'accepted',
+      'delivered',
+      'canceled'
+    ],
+    required: true,
+   
+   },
+   changeStatusTime : Date
   },
   { timestamps: true }
 );
 
 orderSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'user',
+    path: 'customer',
     select: 'name profileImg email phone',
   }).populate({
     path: 'cartItems.product',
-    select: 'title imageCover ',
-  });
+    select:'title imageCover sellerId '
+  }).populate({
+    path: 'seller',
+    select: 'name profileImg email phone'
+  })
 
   next();
 });
