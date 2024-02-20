@@ -18,6 +18,22 @@
 - View Customer Reviews and Ratings (Seller)
 - Manage User Reviews (Admin)
 
+### Omar's Task:
+
+#### Done:
+
+- Place Order (Customer)
+- View Order History (Customer)
+- Manage Orders (Seller)
+- View Sales History (Seller)
+
+#### Remaining:
+
+- Communicate with Seller (Customer)
+- Respond to Customer Inquiries (Seller)
+- Contact Support (Customer and Seller)
+- Manage Support Requests (Admin)
+
 [Postman Collection](https://elements.getpostman.com/redirect?entityId=26246009-659de25c-2971-4a7e-92e1-fcc1ce8acf5f&entityType=collection).
 
 ## Users accounts for testing purposes:
