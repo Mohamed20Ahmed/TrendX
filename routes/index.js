@@ -2,14 +2,13 @@ const userRoute = require("./userRoute");
 const authRoute = require("./authRoute");
 const ApiError = require("../utils/apiError");
 const { sendSuccessResponse } = require("../utils/responseHandler");
-const orderRoute = require('./orderRoute');
-
+const orderRoute = require("./orderRoute");
 
 const mountRoutes = (app) => {
   app.use("/auth", authRoute);
   app.use("/users", userRoute);
-  app.use('/orders', orderRoute);
-
+  app.use("/orders", orderRoute);
+  // app.use("/chat", chatRoute);
 
   app.get("/", (req, res) => {
     sendSuccessResponse(res, { message: "Hello form server side!" }, 200);

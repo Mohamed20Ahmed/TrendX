@@ -1,21 +1,21 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema(
   {
-    seller:{
-       type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: [true, 'products must be produced by seller'],
+    seller: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      required: [true, "products must be produced by seller"],
     },
     customer: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: [true, 'Order must be belong to customer'],
+      ref: "User",
+      required: [true, "Order must be belong to customer"],
     },
     cartItems: [
       {
         product: {
           type: mongoose.Schema.ObjectId,
-          ref: 'Product',
+          ref: "Product",
         },
         quantity: Number,
         color: String,
@@ -39,39 +39,34 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethodType: {
       type: String,
-      default: 'cash',
+      default: "cash",
     },
-   status: {
-    type: String,
-    default: 'pending',
-    enum: [
-      'pending',
-      'accepted',
-      'delivered',
-      'canceled'
-    ],
-    required: true,
-   
-   },
-   changeStatusTime : Date
+    status: {
+      type: String,
+      default: "pending",
+      enum: ["pending", "accepted", "delivered", "canceled"],
+      required: true,
+    },
+    changeStatusTime: Date,
   },
   { timestamps: true }
 );
 
 orderSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'customer',
-    select: 'name profileImg email phone',
-  }).populate({
-    path: 'cartItems.product',
-    select:'title imageCover sellerId '
-  }).populate({
-    path: 'seller',
-    select: 'name profileImg email phone'
+    path: "customer",
+    select: "name profileImg email phone",
   })
+    .populate({
+      path: "cartItems.product",
+      select: "title imageCover sellerId ",
+    })
+    .populate({
+      path: "seller",
+      select: "name profileImg email phone",
+    });
 
   next();
 });
-
-module.exports = mongoose.model('Order', orderSchema);
-
+const orderModel = mongoose.model("Order", orderSchema);
+module.exports = orderModel;

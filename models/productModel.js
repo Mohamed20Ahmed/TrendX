@@ -1,37 +1,35 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
-
   {
-
     sellerId: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
     },
-    
+
     title: {
       type: String,
       required: true,
       trim: true,
-      minlength: [3, 'Too short product title'],
-      maxlength: [100, 'Too long product title'],
+      minlength: [3, "Too short product title"],
+      maxlength: [100, "Too long product title"],
     },
-  
+
     description: {
       type: String,
-      required: [true, 'Product description is required'],
-      minlength: [20, 'Too short product description'],
+      required: [true, "Product description is required"],
+      minlength: [20, "Too short product description"],
     },
     quantity: {
       type: Number,
-      required: [true, 'Product quantity is required'],
+      required: [true, "Product quantity is required"],
     },
 
     price: {
       type: Number,
-      required: [true, 'Product price is required'],
+      required: [true, "Product price is required"],
       trim: true,
-      max: [200000, 'Too long product price'],
+      max: [200000, "Too long product price"],
     },
     sold: {
       type: Number,
@@ -41,14 +39,14 @@ const productSchema = new mongoose.Schema(
 
     imageCover: {
       type: String,
-      required: [true, 'Product Image cover is required'],
+      required: [true, "Product Image cover is required"],
     },
     images: [String],
-    
+
     ratingsAverage: {
       type: Number,
-      min: [1, 'Rating must be above or equal 1.0'],
-      max: [5, 'Rating must be below or equal 5.0'],
+      min: [1, "Rating must be above or equal 1.0"],
+      max: [5, "Rating must be below or equal 5.0"],
       // set: (val) => Math.round(val * 10) / 10, // 3.3333 * 10 => 33.333 => 33 => 3.3
     },
     ratingsQuantity: {
@@ -64,10 +62,10 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-productSchema.virtual('reviews', {
-  ref: 'Review',
-  foreignField: 'product',
-  localField: '_id',
+productSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "product",
+  localField: "_id",
 });
 
 const setImageURL = (doc) => {
@@ -85,12 +83,13 @@ const setImageURL = (doc) => {
   }
 };
 // findOne, findAll and update
-productSchema.post('init', (doc) => {
+productSchema.post("init", (doc) => {
   setImageURL(doc);
 });
 
 // create
-productSchema.post('save', (doc) => {
+productSchema.post("save", (doc) => {
   setImageURL(doc);
 });
-module.exports = mongoose.model('Product', productSchema);
+const productModel = mongoose.model("Product", productSchema);
+module.exports = productModel;

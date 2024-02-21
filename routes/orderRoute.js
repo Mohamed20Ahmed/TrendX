@@ -1,26 +1,24 @@
-const express = require('express');
-const {
-  createCashOrder, updateOrderStatus,
-} = require('../controllers/orderController');
+const express = require("express");
 
-const authMiddleware = require('../middlewares/authMiddleware');
+const {
+  getOrder_S,
+  createCashOrder,
+  updateOrderStatus,
+  deleteOrder,
+} = require("../controllers/orderController");
+const { updateOrderStatusValidator } = require("../validators/orderValidator");
+const { protect, allowedTo } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-router.use(authMiddleware.protect);
-router.route('/:cartId').post(authMiddleware.allowedTo('customer'), createCashOrder);
-router.get(
-  '/',
-  authMiddleware.allowedTo('customer',"seller", 'admin'),
-  filterOrderForLoggedUser,
-  findAllOrders
-);
-router.get('/:id', findSpecificOrder);
+router.use(protect);
+router.route("/:cartId").post(allowedTo("customer"), createCashOrder);
+router.get("/", allowedTo("customer", "seller", "admin"), getOrder_S);
 router.patch(
-    '/status/:id',
-    authMiddleware.allowedTo('seller'),
-    updateOrderStatus
-  );
+  "/status/:orderId",
+  allowedTo("seller"),
+  updateOrderStatusValidator,
+  updateOrderStatus
+);
 
-  
 module.exports = router;
