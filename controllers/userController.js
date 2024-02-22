@@ -155,7 +155,8 @@ const updateCustomerAccount = asyncHandler(async (req, res, next) => {
 });
 
 const updateSellerAccount = asyncHandler(async (req, res, next) => {
-  const { name, email, phoneNumber, address, shopName, shopImage } = req.body;
+  const { name, email, phoneNumber, shopName, shopAddress, shopImage } =
+    req.body;
 
   await uniqueFieldsExistence(
     {
@@ -173,8 +174,8 @@ const updateSellerAccount = asyncHandler(async (req, res, next) => {
       name,
       email,
       phoneNumber,
-      address,
       shopName,
+      shopAddress,
       shopImage,
     }
   );
@@ -220,7 +221,9 @@ const changePassword = asyncHandler(async (req, res, next) => {
     { password: hashedPassword, passwordChangedAt: Date.now() }
   );
 
-  sendSuccessResponse(res, "Password updated successfully", 200);
+  const response = { message: "Password updated successfully" };
+
+  sendSuccessResponse(res, response, 200);
 });
 
 const uniqueFieldsExistence = async (userData, fields) => {

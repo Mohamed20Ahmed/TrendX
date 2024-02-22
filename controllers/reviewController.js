@@ -18,7 +18,10 @@ const getReview_S = asyncHandler(async (req, res, next) => {
   // get specific review
 
   if (req.query.reviewId) {
-    const review = await getReviewByIdDB(reviewId, reviewExcludedFields);
+    const review = await getReviewByIdDB(
+      req.query.reviewId,
+      reviewExcludedFields
+    );
 
     if (!review) {
       return next(new ApiError("review not found", 404));
