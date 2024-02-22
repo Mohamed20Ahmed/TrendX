@@ -23,7 +23,9 @@ const registerAsCustomerValidator = [
     .isMobilePhone("ar-EG")
     .withMessage("Please enter valid egyptian phone number"),
 
-  body("address").notEmpty().withMessage("Please enter your address"),
+  body("address", "Please enter your address").notEmpty().isObject(),
+  body("address.street", "street in address is required").notEmpty(),
+  body("address.city", "city in address is required").notEmpty(),
 
   validatorMiddleware,
 ];
@@ -49,13 +51,9 @@ const registerAsSellerValidator = [
     .isMobilePhone("ar-EG")
     .withMessage("Please enter valid egyptian phone number"),
 
-  body("address").notEmpty().withMessage("Please enter your address"),
-
-  body("creditCard")
-    .notEmpty()
-    .withMessage("Please enter your credit card")
-    .isCreditCard()
-    .withMessage("Please enter a valid credit card number"),
+  body("address", "Please enter your address").notEmpty().isObject(),
+  body("address.street", "street in address is required").notEmpty(),
+  body("address.city", "city in address is required").notEmpty(),
 
   body("shopName").notEmpty().withMessage("Please enter your shop name"),
 

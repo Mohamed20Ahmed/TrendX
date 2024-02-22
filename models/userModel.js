@@ -38,7 +38,10 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
-    address: String,
+    address: {
+      street: String,
+      city: String,
+    },
 
     shopName: {
       type: String,

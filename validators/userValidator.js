@@ -4,6 +4,7 @@ const validatorMiddleware = require("../middlewares/validatorMiddleware");
 
 const updateCustomerValidator = [
   body("name").optional().notEmpty().withMessage("Please enter your name"),
+
   body("email")
     .optional()
     .notEmpty()
@@ -18,10 +19,22 @@ const updateCustomerValidator = [
     .isMobilePhone("ar-EG")
     .withMessage("Please enter valid egyptian phone number"),
 
-  body("address")
+  body("address", "Please enter a valid address")
     .optional()
     .notEmpty()
-    .withMessage("Please enter your address"),
+    .isObject(),
+
+  body("address.street")
+    .optional()
+    .notEmpty()
+    .isString()
+    .withMessage("Please enter a valid street"),
+
+  body("address.city")
+    .optional()
+    .notEmpty()
+    .isString()
+    .withMessage("Please enter a valid city"),
 
   validatorMiddleware,
 ];
@@ -46,7 +59,21 @@ const updateSellerValidator = [
   body("address")
     .optional()
     .notEmpty()
-    .withMessage("Please enter your address"),
+    .withMessage("Please enter your address")
+    .isObject()
+    .withMessage("Please enter a valid address"),
+
+  body("address.street")
+    .optional()
+    .notEmpty()
+    .isString()
+    .withMessage("Please enter a valid street"),
+
+  body("address.city")
+    .optional()
+    .notEmpty()
+    .isString()
+    .withMessage("Please enter a valid city"),
 
   body("shopName")
     .optional()
