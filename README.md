@@ -11,12 +11,13 @@
 - Manage Account Information (Customer, Seller and Admin)
 - Manage User Accounts (Admin)
 - Reset Password (Customer, Seller and Admin)
-
-#### Remaining:
-
 - Leaving Reviews and Ratings (Customer)
 - View Customer Reviews and Ratings (Seller)
 - Manage User Reviews (Admin)
+
+#### Remaining:
+
+- api documentation
 
 ### Omar's Task:
 
