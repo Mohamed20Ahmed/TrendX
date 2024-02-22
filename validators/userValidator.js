@@ -56,29 +56,15 @@ const updateSellerValidator = [
     .isMobilePhone("ar-EG")
     .withMessage("Please enter valid egyptian phone number"),
 
-  body("address")
-    .optional()
-    .notEmpty()
-    .withMessage("Please enter your address")
-    .isObject()
-    .withMessage("Please enter a valid address"),
-
-  body("address.street")
-    .optional()
-    .notEmpty()
-    .isString()
-    .withMessage("Please enter a valid street"),
-
-  body("address.city")
-    .optional()
-    .notEmpty()
-    .isString()
-    .withMessage("Please enter a valid city"),
-
   body("shopName")
     .optional()
     .notEmpty()
     .withMessage("Please enter your shop name"),
+
+  body("shopAddress")
+    .optional()
+    .notEmpty()
+    .withMessage("Please enter your shop address"),
 
   validatorMiddleware,
 ];

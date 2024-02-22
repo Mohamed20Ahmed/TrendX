@@ -50,8 +50,8 @@ const registerAsSeller = asyncHandler(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     phoneNumber: req.body.phoneNumber,
-    address: { street: req.body.street, city: req.body.city },
     shopName: req.body.shopName,
+    shopAddress: req.body.shopAddress,
     shopImage: req.body.shopImage,
     role: "seller",
   };
@@ -133,7 +133,9 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
     return next(new ApiError("There is an error in sending email", 500));
   }
 
-  sendSuccessResponse(res, "Reset code sent to your email", 200);
+  const response = { message: "Reset code sent to your email" };
+
+  sendSuccessResponse(res, response, 200);
 });
 
 const verifyResetCode = asyncHandler(async (req, res, next) => {
@@ -152,9 +154,12 @@ const verifyResetCode = asyncHandler(async (req, res, next) => {
   }
 
   user.passwordResetVerified = true;
+
   await user.save();
 
-  sendSuccessResponse(res, "Success", 200);
+  const response = { message: "Verified" };
+
+  sendSuccessResponse(res, response, 200);
 });
 
 const resetPassword = asyncHandler(async (req, res, next) => {
@@ -170,7 +175,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Reset code not verified", 400));
   }
 
-  user.password = newPassword;
+  user.password = await hash(newPassword);
   user.passwordResetCode = undefined;
   user.passwordResetExpires = undefined;
   user.passwordResetVerified = undefined;
@@ -183,7 +188,9 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     role: user.role,
   });
 
-  sendSuccessResponse(res, { token }, 200);
+  const response = { token };
+
+  sendSuccessResponse(res, response, 200);
 });
 
 const uniqueFieldsExistence = async (fields) => {
