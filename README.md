@@ -1,6 +1,8 @@
 # TrendX
 
-### Mohammed's Task:
+[Postman Collection](https://trendx2024.postman.co/workspace/TrendX-Workspace~e5f96089-93ad-4138-8d7b-87ae78db7652/collection/26246009-659de25c-2971-4a7e-92e1-fcc1ce8acf5f?action=share&creator=26246009).
+
+## Mohammed's Task:
 
 #### Done:
 
@@ -19,7 +21,7 @@
 
 - Testing
 
-### Omar's Task:
+## Omar's Task:
 
 #### Done:
 
@@ -34,8 +36,6 @@
 - Respond to Customer Inquiries (Seller)
 - Contact Support (Customer and Seller)
 - Manage Support Requests (Admin)
-
-[Postman Collection](https://elements.getpostman.com/redirect?entityId=26246009-659de25c-2971-4a7e-92e1-fcc1ce8acf5f&entityType=collection).
 
 ## Users accounts for testing purposes:
 
