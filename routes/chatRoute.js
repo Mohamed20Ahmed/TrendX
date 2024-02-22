@@ -1,12 +1,8 @@
-// const express = require("express");
+const express = require("express");
 
-// const { protect, allowedTo } = require("../middlewares/authMiddleware");
+const { protect, allowedTo } = require("../middlewares/authMiddleware");
+const { chatSignUp, chatLogin } = require("../controllers/chatController");
+const router = express.Router();
 
-// const router = express.Router();
-
-// router.use(protect);
-
-// app.post("/chatAuth", async (req, res) => {
-//   const { username } = req.body;
-//   return res.json({ username: username, secret: "sha256..." });
-// });
+router.post("/signup", chatSignUp);
+module.exports = router;

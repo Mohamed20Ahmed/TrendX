@@ -8,7 +8,6 @@ const mountRoutes = (app) => {
   app.use("/auth", authRoute);
   app.use("/users", userRoute);
   app.use("/orders", orderRoute);
-  // app.use("/chat", chatRoute);
 
   app.get("/", (req, res) => {
     sendSuccessResponse(res, { message: "Hello form server side!" }, 200);

@@ -4,15 +4,20 @@ const {
   getOrder_S,
   createCashOrder,
   updateOrderStatus,
-  deleteOrder,
 } = require("../controllers/orderController");
-const { updateOrderStatusValidator } = require("../validators/orderValidator");
+const {
+  updateOrderStatusValidator,
+  validateCartId,
+} = require("../validators/orderValidator");
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.use(protect);
-router.route("/:cartId").post(allowedTo("customer"), createCashOrder);
+router
+  .route("/:cartId")
+  .post(allowedTo("customer"), validateCartId, createCashOrder);
+
 router.get("/", allowedTo("customer", "seller", "admin"), getOrder_S);
 router.patch(
   "/status/:orderId",

@@ -1,6 +1,8 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 const validatorMiddleware = require("../middlewares/validatorMiddleware");
+const mongoose = require("mongoose");
+
 const updateOrderStatusValidator = [
   body("status")
     .notEmpty()
@@ -12,4 +14,9 @@ const updateOrderStatusValidator = [
 
   validatorMiddleware,
 ];
-module.exports = { updateOrderStatusValidator };
+const validateCartId = [
+  param("cartId").isMongoId().withMessage("Invalid cart id format"),
+
+  validatorMiddleware,
+];
+module.exports = { updateOrderStatusValidator, validateCartId };
