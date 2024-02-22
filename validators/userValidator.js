@@ -1,18 +1,9 @@
 const { body } = require("express-validator");
-const slugify = require("slugify");
 
 const validatorMiddleware = require("../middlewares/validatorMiddleware");
 
 const updateCustomerValidator = [
-  body("name")
-    .optional()
-    .notEmpty()
-    .withMessage("Please enter your name")
-    .custom((value, { req }) => {
-      req.body.slug = slugify(value);
-      return true;
-    }),
-
+  body("name").optional().notEmpty().withMessage("Please enter your name"),
   body("email")
     .optional()
     .notEmpty()
@@ -36,14 +27,7 @@ const updateCustomerValidator = [
 ];
 
 const updateSellerValidator = [
-  body("name")
-    .optional()
-    .notEmpty()
-    .withMessage("Please enter your name")
-    .custom((value, { req }) => {
-      req.body.slug = slugify(value);
-      return true;
-    }),
+  body("name").optional().notEmpty().withMessage("Please enter your name"),
 
   body("email")
     .optional()
@@ -73,15 +57,7 @@ const updateSellerValidator = [
 ];
 
 const updateAdminValidator = [
-  body("name")
-    .optional()
-    .notEmpty()
-    .withMessage("Please enter your name")
-    .custom((value, { req }) => {
-      console.log(value);
-      req.body.slug = slugify(value);
-      return true;
-    }),
+  body("name").optional().notEmpty().withMessage("Please enter your name"),
 
   body("email")
     .optional()

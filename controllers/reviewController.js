@@ -8,6 +8,7 @@ const {
   updateReviewDB,
   deleteReviewDB,
 } = require("../database/reviewDB");
+const { getProductByIdDB } = require("../database/productDB");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const ApiError = require("../utils/apiError");
 
@@ -41,7 +42,13 @@ const getReview_S = asyncHandler(async (req, res, next) => {
 const createReview = asyncHandler(async (req, res, next) => {
   const customerId = req.user._id;
 
-  const { title, ratings, productId } = req.body;
+  const { title, rating, productId } = req.body;
+
+  const product = await getProductByIdDB(productId);
+
+  if (!product) {
+    return next(new ApiError("Product not found"));
+  }
 
   const oldReview = await getReviewDB({
     customer: customerId,
@@ -54,197 +61,119 @@ const createReview = asyncHandler(async (req, res, next) => {
 
   await createReviewDB({
     title,
-    ratings,
+    rating,
     customer: customerId,
     product: productId,
   });
+
+  // calcutate newRating after new rate added
+  let newRating =
+    (product.ratingsAverage * product.ratingsQuantity + rating) /
+    (product.ratingsQuantity + 1);
+
+  newRating = parseFloat(newRating.toFixed(1));
+
+  product.ratingsAverage = newRating;
+  product.ratingsQuantity++;
+
+  await product.save();
 
   const response = { message: "Review created successfully" };
 
   sendSuccessResponse(res, response, 201);
 });
 
-const updateStatus = asyncHandler(async (req, res, next) => {
-  const email = req.params.email;
-  const { active } = req.body;
+const updateReview = asyncHandler(async (req, res, next) => {
+  const customerId = req.user._id;
 
-  if (!email) {
-    return next(new ApiError("user email is required"));
+  const reviewId = req.params.reviewId;
+
+  const { title, rating } = req.body;
+
+  const review = await getReviewByIdDB(reviewId);
+
+  if (!review) {
+    return next(new ApiError("Review not found"));
   }
 
-  const user = await updateUserDB({ email }, { active });
+  const product = await getProductByIdDB(review.product);
 
-  if (!user) {
-    return next(new ApiError("user not found"));
+  if (!product) {
+    return next(new ApiError("Product not found"));
   }
 
-  const response = { message: "user status updated" };
+  if (review.customer._id.toString() !== customerId.toString()) {
+    return next(new ApiError("You cannot update this review"));
+  }
+
+  await updateReviewDB({ _id: review._id }, { title, rating });
+
+  if (rating) {
+    // calcutate newRating after old rate updated
+    let newRating =
+      (product.ratingsAverage * product.ratingsQuantity -
+        review.rating +
+        rating) /
+      product.ratingsQuantity;
+
+    newRating = parseFloat(newRating.toFixed(1));
+
+    product.ratingsAverage = newRating;
+
+    await product.save();
+  }
+
+  const response = { message: "Review updated successfully" };
 
   sendSuccessResponse(res, response, 200);
 });
 
-const deleteUser = asyncHandler(async (req, res, next) => {
-  const email = req.params.email;
+const deleteReview = asyncHandler(async (req, res, next) => {
+  const user = req.user;
 
-  if (!email) {
-    return next(new ApiError("user email is required", 400));
+  const reviewId = req.params.reviewId;
+
+  const review = await getReviewByIdDB(reviewId);
+
+  if (!review) {
+    return next(new ApiError("Review not found"));
   }
 
-  const user = await deleteUserDB({ email });
+  const product = await getProductByIdDB(review.product);
 
-  if (!user) {
-    return next(new ApiError("user not found", 404));
+  if (!product) {
+    return next(new ApiError("Product not found"));
   }
 
-  const response = { message: "user deleted successfully" };
+  if (
+    review.customer._id.toString() !== user._id.toString() &&
+    user.role !== "admin"
+  ) {
+    return next(new ApiError("You cannot delete this review"));
+  }
 
-  sendSuccessResponse(res, response, 204);
-});
+  await deleteReviewDB({ _id: review._id });
 
-const updateCustomerAccount = asyncHandler(async (req, res, next) => {
-  const { name, slug, email, phoneNumber, address } = req.body;
+  // calcutate newRating after old rate deleted
+  let newRating =
+    (product.ratingsAverage * product.ratingsQuantity - review.rating) /
+    (product.ratingsQuantity - 1);
 
-  await uniqueFieldsExistence(
-    { email: req.user.email, phoneNumber: req.user.phoneNumber },
-    { email, phoneNumber }
-  );
+  newRating = parseFloat(newRating.toFixed(1));
 
-  // Update customer information
-  await updateUserDB(
-    { _id: req.user._id },
-    { name, slug, email, phoneNumber, address }
-  );
+  product.ratingsAverage = newRating;
+  product.ratingsQuantity--;
 
-  const response = { message: "Customer updated successfully" };
+  await product.save();
+
+  const response = { message: "Review deleted successfully" };
 
   sendSuccessResponse(res, response, 200);
 });
-
-const updateSellerAccount = asyncHandler(async (req, res, next) => {
-  const {
-    name,
-    slug,
-    email,
-    phoneNumber,
-    address,
-    creditCard,
-    shopName,
-    shopImage,
-  } = req.body;
-
-  await uniqueFieldsExistence(
-    {
-      email: req.user.email,
-      phoneNumber: req.user.phoneNumber,
-      shopName: req.user.shopName,
-    },
-    { email, phoneNumber, shopName }
-  );
-
-  // Update seller information
-  await updateUserDB(
-    { _id: req.user._id },
-    {
-      name,
-      slug,
-      email,
-      phoneNumber,
-      address,
-      creditCard,
-      shopName,
-      shopImage,
-    }
-  );
-
-  const response = { message: "Seller updated successfully" };
-
-  sendSuccessResponse(res, response, 200);
-});
-
-const updateAdminAccount = asyncHandler(async (req, res, next) => {
-  const { name, slug, email, phoneNumber } = req.body;
-
-  await uniqueFieldsExistence(
-    { email: req.user.email, phoneNumber: req.user.phoneNumber },
-    { email, phoneNumber }
-  );
-
-  await updateUserDB(
-    { _id: req.user._id },
-    {
-      name,
-      slug,
-      email,
-      phoneNumber,
-    }
-  );
-
-  const response = { message: "Admin updated successfully" };
-
-  sendSuccessResponse(res, response, 200);
-});
-
-const changePassword = asyncHandler(async (req, res, next) => {
-  const { oldPassword, newPassword } = req.body;
-
-  if (!(await compare(oldPassword, req.user.password))) {
-    return next(new ApiError("Incorrect password", 400));
-  }
-
-  const hashedPassword = await hash(newPassword);
-
-  await updateUserDB(
-    { _id: req.user._id },
-    { password: hashedPassword, passwordChangedAt: Date.now() }
-  );
-
-  sendSuccessResponse(res, "Password updated successfully", 200);
-});
-
-const uniqueFieldsExistence = async (userData, fields) => {
-  if (fields.email) {
-    const emailExistence = await getUserDB({ email: fields.email });
-
-    // check if email not exists in database
-    if (emailExistence && emailExistence.email != userData.email) {
-      throw new ApiError("email already exists", 400);
-    }
-  }
-
-  if (fields.phoneNumber) {
-    const phoneNumberExistence = await getUserDB({
-      phoneNumber: fields.phoneNumber,
-    });
-
-    // check if phoneNumber not exists in database
-    if (
-      phoneNumberExistence &&
-      phoneNumberExistence.phoneNumber != userData.phoneNumber
-    ) {
-      throw new ApiError("phoneNumber already exists", 400);
-    }
-  }
-
-  if (fields.shopName) {
-    const shopNameExistence = await getUserDB({ shopName: fields.shopName });
-
-    // check if phoneNumber not exists in database
-    if (shopNameExistence && shopNameExistence.shopName != userData.shopName) {
-      throw new ApiError("shopName already exists", 400);
-    }
-  }
-};
 
 module.exports = {
-  uploadShopImage,
-  resizeImage,
-  getCustomer_S,
-  getSeller_S,
-  getUserAccount,
-  updateStatus,
-  deleteUser,
-  updateSellerAccount,
-  updateCustomerAccount,
-  updateAdminAccount,
-  changePassword,
+  getReview_S,
+  createReview,
+  updateReview,
+  deleteReview,
 };

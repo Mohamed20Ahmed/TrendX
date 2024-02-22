@@ -136,7 +136,7 @@ const deleteUser = asyncHandler(async (req, res, next) => {
 });
 
 const updateCustomerAccount = asyncHandler(async (req, res, next) => {
-  const { name, slug, email, phoneNumber, address } = req.body;
+  const { name, email, phoneNumber, address } = req.body;
 
   await uniqueFieldsExistence(
     { email: req.user.email, phoneNumber: req.user.phoneNumber },
@@ -146,7 +146,7 @@ const updateCustomerAccount = asyncHandler(async (req, res, next) => {
   // Update customer information
   await updateUserDB(
     { _id: req.user._id },
-    { name, slug, email, phoneNumber, address }
+    { name, email, phoneNumber, address }
   );
 
   const response = { message: "Customer updated successfully" };
@@ -155,16 +155,8 @@ const updateCustomerAccount = asyncHandler(async (req, res, next) => {
 });
 
 const updateSellerAccount = asyncHandler(async (req, res, next) => {
-  const {
-    name,
-    slug,
-    email,
-    phoneNumber,
-    address,
-    creditCard,
-    shopName,
-    shopImage,
-  } = req.body;
+  const { name, email, phoneNumber, address, creditCard, shopName, shopImage } =
+    req.body;
 
   await uniqueFieldsExistence(
     {
@@ -180,7 +172,6 @@ const updateSellerAccount = asyncHandler(async (req, res, next) => {
     { _id: req.user._id },
     {
       name,
-      slug,
       email,
       phoneNumber,
       address,
@@ -196,7 +187,7 @@ const updateSellerAccount = asyncHandler(async (req, res, next) => {
 });
 
 const updateAdminAccount = asyncHandler(async (req, res, next) => {
-  const { name, slug, email, phoneNumber } = req.body;
+  const { name, email, phoneNumber } = req.body;
 
   await uniqueFieldsExistence(
     { email: req.user.email, phoneNumber: req.user.phoneNumber },
@@ -207,7 +198,6 @@ const updateAdminAccount = asyncHandler(async (req, res, next) => {
     { _id: req.user._id },
     {
       name,
-      slug,
       email,
       phoneNumber,
     }

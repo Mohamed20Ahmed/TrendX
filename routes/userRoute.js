@@ -14,7 +14,6 @@ const {
   updateAdminAccount,
   changePassword,
 } = require("../controllers/userController");
-
 const {
   updateSellerValidator,
   updateCustomerValidator,

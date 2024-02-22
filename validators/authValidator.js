@@ -1,17 +1,9 @@
 const { body } = require("express-validator");
-const slugify = require("slugify");
 
 const validatorMiddleware = require("../middlewares/validatorMiddleware");
 
 const registerAsCustomerValidator = [
-  body("name")
-    .notEmpty()
-    .withMessage("Please enter your name")
-    .custom((value, { req }) => {
-      console.log(value);
-      req.body.slug = slugify(value);
-      return true;
-    }),
+  body("name").notEmpty().withMessage("Please enter your name"),
 
   body("email")
     .notEmpty()
@@ -37,14 +29,7 @@ const registerAsCustomerValidator = [
 ];
 
 const registerAsSellerValidator = [
-  body("name")
-    .notEmpty()
-    .withMessage("Please enter your name")
-    .custom((value, { req }) => {
-      console.log(value);
-      req.body.slug = slugify(value);
-      return true;
-    }),
+  body("name").notEmpty().withMessage("Please enter your name"),
 
   body("email")
     .notEmpty()

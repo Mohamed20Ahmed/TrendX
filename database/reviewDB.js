@@ -21,7 +21,7 @@ const getProductReviewsDB = async (req) => {
 
   // apply api features
   const apiFeatures = new ApiFeatures(
-    userModel.find({ product: req.query.productId }),
+    reviewModel.find({ product: req.query.productId }),
     req.query
   )
     .paginate(documentsCounts)
@@ -41,11 +41,11 @@ const createReviewDB = async (data) => {
 };
 
 const updateReviewDB = async (field, data) => {
-  return await reviewModel.findOneAndUpdate(field, data);
+  return await reviewModel.updateOne(field, data);
 };
 
 const deleteReviewDB = async (field) => {
-  return await reviewModel.findOneAndDelete(field);
+  return await reviewModel.deleteOne(field);
 };
 
 module.exports = {

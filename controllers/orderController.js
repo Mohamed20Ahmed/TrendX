@@ -25,7 +25,7 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
 
   const product = await getProductByIdDB(cart.cartItems[0].product);
   const seller = product.sellerId.toString();
-  console.log(seller);
+
   const cartPrice = cart.totalCartPrice;
   const totalOrderPrice = cartPrice + shippingPrice;
   const order = await createOrderDB({
@@ -53,7 +53,6 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
 const getOrder_S = asyncHandler(async (req, res, next) => {
   const orderExcludedFields = "-__v";
   const user = req.user;
-  console.log(req.query.orderId);
 
   // get specific order
   if (req.query.orderId) {

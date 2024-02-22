@@ -25,7 +25,6 @@ const createUser = async (data) => {
 const registerAsCustomer = asyncHandler(async (req, res, next) => {
   const customer = {
     name: req.body.name,
-    slug: req.body.slug,
     email: req.body.email,
     password: req.body.password,
     phoneNumber: req.body.phoneNumber,
@@ -48,7 +47,6 @@ const registerAsCustomer = asyncHandler(async (req, res, next) => {
 const registerAsSeller = asyncHandler(async (req, res, next) => {
   const seller = {
     name: req.body.name,
-    slug: req.body.slug,
     email: req.body.email,
     password: req.body.password,
     phoneNumber: req.body.phoneNumber,
@@ -130,9 +128,8 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
     user.passwordResetExpires = undefined;
     user.passwordResetVerified = undefined;
 
-    console.log(err);
-
     await user.save();
+
     return next(new ApiError("There is an error in sending email", 500));
   }
 
