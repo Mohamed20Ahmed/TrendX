@@ -13,23 +13,27 @@ const getCountOfDocument = async (field) => {
   return await reviewModel.find(field).countDocuments();
 };
 
-const getReviewsDB = async (role, req) => {
-  // get count of users to use it in pagination results
-  const documentsCounts = await getCountOfDocument();
+const getProductReviewsDB = async (req) => {
+  // get count of reviews to use it in pagination results
+  const documentsCounts = await getCountOfDocument({
+    product: req.query.productId,
+  });
 
   // apply api features
-  const apiFeatures = new ApiFeatures(userModel.find(), req.query)
+  const apiFeatures = new ApiFeatures(
+    userModel.find({ product: req.query.productId }),
+    req.query
+  )
     .paginate(documentsCounts)
-    .filter()
     .limitFields()
     .sort();
 
   // result from api features
   const { mongooseQuery, paginationResult } = apiFeatures;
 
-  const users = await mongooseQuery;
+  const reviews = await mongooseQuery;
 
-  return { paginationResult, users };
+  return { paginationResult, reviews };
 };
 
 const createReviewDB = async (data) => {
@@ -47,7 +51,7 @@ const deleteReviewDB = async (field) => {
 module.exports = {
   getReviewByIdDB,
   getReviewDB,
-  getReviewsDB,
+  getProductReviewsDB,
   createReviewDB,
   updateReviewDB,
   deleteReviewDB,
