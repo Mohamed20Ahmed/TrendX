@@ -17,8 +17,7 @@
 
 #### Remaining:
 
-- testing
-- api documentation
+- Testing
 
 ### Omar's Task:
 
