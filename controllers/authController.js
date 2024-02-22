@@ -50,7 +50,7 @@ const registerAsSeller = asyncHandler(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     phoneNumber: req.body.phoneNumber,
-    address: req.body.address,
+    address: { street: req.body.street, city: req.body.city },
     shopName: req.body.shopName,
     shopImage: req.body.shopImage,
     role: "seller",
