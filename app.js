@@ -21,7 +21,7 @@ dbConnection();
 const app = express();
 
 // Enable other domains to acccess your application
-app.use(cors());
+app.use(cors({ origin: true }));
 app.options("*", cors());
 
 // Middlewares

@@ -16,7 +16,6 @@ const { sendSuccessResponse } = require("../utils/responseHandler");
 const Cart = require("../models/cartModel");
 
 const createCashOrder = asyncHandler(async (req, res, next) => {
-  const shippingPrice = 0;
   const cart = await getCartByIdDB(req.params.cartId);
   const user = req.user;
   if (!cart || cart.customer.toString() !== user._id.toString()) {
@@ -26,20 +25,24 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
   const product = await getProductByIdDB(cart.cartItems[0].product);
   const seller = product.sellerId.toString();
 
-  const cartPrice = cart.totalCartPrice;
-  const totalOrderPrice = cartPrice + shippingPrice;
+  let shippingAddress = req.body.shippingAddress;
+  if (!shippingAddress) {
+    shippingAddress = { phone: user.phoneNumber, address: user.address };
+  }
+
   const order = await createOrderDB({
     seller,
-    customer: req.user._id,
+    customer: user._id,
     cartItems: cart.cartItems,
-    shippingAddress: req.body.shippingAddress,
-    totalOrderPrice,
+    shippingAddress,
+    totalOrderPrice: cart.totalCartPrice,
   });
+
   if (order) {
     const bulkOption = cart.cartItems.map((item) => ({
       updateOne: {
         filter: { _id: item.product },
-        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+        update: { $inc: { sold: +item.quantity } },
       },
     }));
     await productBulkWriteDB(bulkOption, {});
@@ -89,6 +92,7 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
   }
 
   order.status = req.body.status;
+  order.shippingPrice = req.body.shippingPrice;
   order.changeStatusTime = Date.now();
   const updatedOrder = await order.save();
 
