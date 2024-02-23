@@ -19,10 +19,6 @@
 - View Customer Reviews and Ratings (Seller)
 - Manage User Reviews (Admin)
 
-#### Remaining:
-
-- Testing
-
 ## Omar's Task:
 
 #### Done:
