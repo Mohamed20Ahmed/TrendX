@@ -9,7 +9,6 @@
 #### Done:
 
 - Login (Customer, Seller and Admin)
-- Logout (Customer, Seller and Admin)
 - Register as Customer (Customer)
 - Register as Seller (Seller)
 - Manage Account Information (Customer, Seller and Admin)
@@ -18,6 +17,7 @@
 - Leaving Reviews and Ratings (Customer)
 - View Customer Reviews and Ratings (Seller)
 - Manage User Reviews (Admin)
+
 
 ## Omar's Task:
 
