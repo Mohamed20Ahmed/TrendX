@@ -5,12 +5,12 @@ const userRoute = require("./userRoute");
 const authRoute = require("./authRoute");
 const orderRoute = require("./orderRoute");
 const reviewRoute = require("./reviewRoute");
-
+const chatRoute = require("./chatRoute");
 const mountRoutes = (app) => {
   app.use("/auth", authRoute);
   app.use("/users", userRoute);
   app.use("/orders", orderRoute);
-  // app.use("/chat", chatRoute);
+  app.use("/chats", chatRoute);
   app.use("/reviews", reviewRoute);
 
   app.get("/", (req, res) => {

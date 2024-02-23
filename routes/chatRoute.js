@@ -1,8 +1,6 @@
 const express = require("express");
-
-const { protect, allowedTo } = require("../middlewares/authMiddleware");
-const { chatSignUp, chatLogin } = require("../controllers/chatController");
+const { getAllSupportChats } = require("../controllers/chatController");
 const router = express.Router();
 
-router.post("/signup", chatSignUp);
+router.get("/support", getAllSupportChats);
 module.exports = router;
