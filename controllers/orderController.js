@@ -57,6 +57,7 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
 const getOrder_S = asyncHandler(async (req, res, next) => {
   const orderExcludedFields = "-__v";
   const user = req.user;
+  console.log(req.user);
 
   // get specific order
   if (req.query.orderId) {
