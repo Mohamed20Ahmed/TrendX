@@ -46,7 +46,33 @@ const getAllSupportChats = asyncHandler(async (req, res, next) => {
 //   return chats;
 // };
 // getSupportMessages (admin, seller, customer)
+const getSupportMessages = asyncHandler(async (req, res, next) => {
+  const supportChatsPath = "SupportChat";
 
+  const supportChats = await getMessages(supportChatsPath);
+
+  if (!supportChats) {
+    return next(new ApiError("No support chats found", 404));
+  }
+
+  //   let chats = [];
+  const chatsId = Object.keys(supportChats);
+  const chats = await chatsId.map(async (ch) => {
+    const lastMessageId = Object.keys(ch);
+    console.log("Ccc", ch);
+    console.log("LLAAASSTTT", lastMessageId);
+    //     const lastMessage = await getMessages(`SupportChat/${ch}`, 1);
+    //     console.log("LAAASSSTT", lastMessage);
+    //     console.log("Ccc", ch);
+    //     return {
+    //       chatName: ch,
+    //       lastMessage,
+    //     };
+  });
+  //   const chats = await customize(chatsId);
+  console.log("CHHHHHAAATTT", chats);
+  sendSuccessResponse(res, chats, 200);
+});
 // sendSupportMessage (admin,seller, customer)
 
 // getMyShopChats (seller)
@@ -54,4 +80,5 @@ const getAllSupportChats = asyncHandler(async (req, res, next) => {
 // sendShopMessage (seller, customer)
 module.exports = {
   getAllSupportChats,
+  getSupportMessages,
 };
