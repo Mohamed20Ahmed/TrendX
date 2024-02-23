@@ -18,7 +18,6 @@
 - View Customer Reviews and Ratings (Seller)
 - Manage User Reviews (Admin)
 
-
 ## Omar's Task:
 
 #### Done:
@@ -27,9 +26,6 @@
 - View Order History (Customer)
 - Manage Orders (Seller)
 - View Sales History (Seller)
-
-#### Remaining:
-
 - Communicate with Seller (Customer)
 - Respond to Customer Inquiries (Seller)
 - Contact Support (Customer and Seller)
