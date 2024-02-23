@@ -2,6 +2,7 @@ const router = require("express").Router({ mergeParams: true });
 
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
 const {
+  getReviewValidator,
   createReviewValidator,
   updateReviewValidator,
   deleteReviewValidator,
@@ -13,7 +14,7 @@ const {
   deleteReview,
 } = require("../controllers/reviewController");
 
-router.get("/", getReview_S);
+router.get("/", getReviewValidator, getReview_S);
 
 router.use(protect);
 

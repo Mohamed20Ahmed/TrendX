@@ -132,7 +132,7 @@ const deleteUser = asyncHandler(async (req, res, next) => {
 
   const response = { message: "user deleted successfully" };
 
-  sendSuccessResponse(res, response, 204);
+  sendSuccessResponse(res, response, 200);
 });
 
 const updateCustomerAccount = asyncHandler(async (req, res, next) => {

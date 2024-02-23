@@ -1,5 +1,7 @@
 # TrendX
 
+[API Documentation](https://documenter.getpostman.com/view/26246009/2sA2rCUMEi).
+
 [Postman Collection](https://trendx2024.postman.co/workspace/TrendX-Workspace~e5f96089-93ad-4138-8d7b-87ae78db7652/collection/26246009-659de25c-2971-4a7e-92e1-fcc1ce8acf5f?action=share&creator=26246009).
 
 ## Mohammed's Task:
@@ -7,7 +9,6 @@
 #### Done:
 
 - Login (Customer, Seller and Admin)
-- Logout (Customer, Seller and Admin)
 - Register as Customer (Customer)
 - Register as Seller (Seller)
 - Manage Account Information (Customer, Seller and Admin)
@@ -17,9 +18,6 @@
 - View Customer Reviews and Ratings (Seller)
 - Manage User Reviews (Admin)
 
-#### Remaining:
-
-- Testing
 
 ## Omar's Task:
 

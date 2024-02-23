@@ -3,7 +3,11 @@ const { body } = require("express-validator");
 const validatorMiddleware = require("../middlewares/validatorMiddleware");
 
 const registerAsCustomerValidator = [
-  body("name").notEmpty().withMessage("Please enter your name"),
+  body("name")
+    .notEmpty()
+    .withMessage("Please enter your name")
+    .isString()
+    .withMessage("name must be a string"),
 
   body("email")
     .notEmpty()
@@ -14,30 +18,46 @@ const registerAsCustomerValidator = [
   body("password")
     .notEmpty()
     .withMessage("Please enter your password")
+    .isString()
+    .withMessage("password must be a string")
     .isLength({ min: 8 })
     .withMessage("password must be at least 8 characters"),
 
   body("phoneNumber")
     .notEmpty()
-    .withMessage("Please enter your phone number")
+    .withMessage("Please enter your phoneNumber")
     .isMobilePhone("ar-EG")
-    .withMessage("Please enter valid egyptian phone number"),
+    .withMessage("Please enter valid egyptian phoneNumber"),
 
   body("address")
     .notEmpty()
     .withMessage("Please enter your address")
     .isObject()
-    .withMessage("Please enter a valid address"),
+    .withMessage(
+      "Please enter a valid address object containing street and city"
+    ),
 
-  body("address.street", "street in address is required").notEmpty(),
+  body("address.street")
+    .notEmpty()
+    .withMessage("street in address is required")
+    .isString()
+    .withMessage("street must be a string"),
 
-  body("address.city", "city in address is required").notEmpty(),
+  body("address.city")
+    .notEmpty()
+    .withMessage("city in address is required")
+    .isString()
+    .withMessage("city must be a string"),
 
   validatorMiddleware,
 ];
 
 const registerAsSellerValidator = [
-  body("name").notEmpty().withMessage("Please enter your name"),
+  body("name")
+    .notEmpty()
+    .withMessage("Please enter your name")
+    .isString()
+    .withMessage("name must be a string"),
 
   body("email")
     .notEmpty()
@@ -48,18 +68,28 @@ const registerAsSellerValidator = [
   body("password")
     .notEmpty()
     .withMessage("Please enter your password")
+    .isString()
+    .withMessage("password must be a string")
     .isLength({ min: 8 })
     .withMessage("password must be at least 8 characters"),
 
   body("phoneNumber")
     .notEmpty()
-    .withMessage("Please enter your phone number")
+    .withMessage("Please enter your phoneNumber")
     .isMobilePhone("ar-EG")
-    .withMessage("Please enter valid egyptian phone number"),
+    .withMessage("Please enter valid egyptian phoneNumber"),
 
-  body("shopName").notEmpty().withMessage("Please enter your shop name"),
+  body("shopName")
+    .notEmpty()
+    .withMessage("Please enter your shopName")
+    .isString()
+    .withMessage("shopName must be a string"),
 
-  body("shopAddress").notEmpty().withMessage("Please enter your shop address"),
+  body("shopAddress")
+    .notEmpty()
+    .withMessage("Please enter your shopAddress")
+    .isString()
+    .withMessage("shopAddress must be a string"),
 
   validatorMiddleware,
 ];
@@ -71,7 +101,11 @@ const loginValidator = [
     .isEmail()
     .withMessage("Please enter a valid email"),
 
-  body("password").notEmpty().withMessage("Please enter your password"),
+  body("password")
+    .notEmpty()
+    .withMessage("Please enter your password")
+    .isString()
+    .withMessage("password must be a string"),
 
   validatorMiddleware,
 ];
@@ -95,9 +129,9 @@ const verifyResetCodeValidator = [
 
   body("resetCode")
     .notEmpty()
-    .withMessage("Please Reset Code")
+    .withMessage("Please resetCode")
     .isLength({ min: 6, max: 6 })
-    .withMessage("Reset Code must be at 6 digits"),
+    .withMessage("resetCode must be at 6 digits"),
 
   validatorMiddleware,
 ];
@@ -112,6 +146,8 @@ const resetPasswordValidator = [
   body("newPassword")
     .notEmpty()
     .withMessage("Please enter password")
+    .isString()
+    .withMessage("password must be a string")
     .isLength({ min: 8 })
     .withMessage("password must be at least 8 characters"),
 
