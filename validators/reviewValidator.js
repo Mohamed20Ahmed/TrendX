@@ -1,5 +1,19 @@
-const { param, body } = require("express-validator");
+const { param, query, body } = require("express-validator");
 const validatorMiddleware = require("../middlewares/validatorMiddleware");
+
+const getReviewValidator = [
+  query("reviewId")
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid review id format"),
+
+  query("productId")
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid product id format"),
+
+  validatorMiddleware,
+];
 
 const createReviewValidator = [
   body("title").isString(),
@@ -35,6 +49,7 @@ const deleteReviewValidator = [
 ];
 
 module.exports = {
+  getReviewValidator,
   createReviewValidator,
   updateReviewValidator,
   deleteReviewValidator,
