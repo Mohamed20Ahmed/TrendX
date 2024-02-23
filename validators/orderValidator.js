@@ -1,7 +1,6 @@
 const { body, param } = require("express-validator");
 
 const validatorMiddleware = require("../middlewares/validatorMiddleware");
-const mongoose = require("mongoose");
 
 const updateOrderStatusValidator = [
   body("status")

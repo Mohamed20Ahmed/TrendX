@@ -31,27 +31,17 @@ const getAllSupportChats = asyncHandler(async (req, res, next) => {
   sendSuccessResponse(res, chats, 200);
 });
 
-// const customize = async (chatsId) => {
-//   const chats = await chatsId.map(async (ch) => {
-//     const lastMessage = await getMessages(`SupportChat/${ch}`, 1);
-//     console.log("LAAASSSTT", lastMessage);
-//     console.log("Ccc", ch);
-//     return {
-//       chatName: ch,
-//       lastMessage,
-//     };
-//   });
-//   return chats;
-// };
-// getSupportMessages (admin, seller, customer)
 const getSupportMessages = asyncHandler(async (req, res, next) => {
-  if (!req.params.supportId) {
-    return next(new ApiError("No support chat found", 404));
+  const user = req.user;
+  let supportChatsPath;
+  if (user.role === "admin") {
+    if (!req.query.chatId) {
+      return next(new ApiError("Please Provide ChatId", 400));
+    }
+    supportChatsPath = `SupportChat/${req.query.chatId}`;
+  } else {
+    supportChatsPath = `SupportChat/${user.email.split(".")[0]}`;
   }
-
-  const supportChatsPath = "SupportChat" + "/" + req.params.supportId;
-  console.log("supportChatsPath", supportChatsPath);
-
   const supportChats = await getMessages(supportChatsPath);
 
   if (!supportChats) {
@@ -59,40 +49,35 @@ const getSupportMessages = asyncHandler(async (req, res, next) => {
   }
 
   const messages = Object.values(supportChats);
-  console.log(req.user);
-  const filteredMessages = messages.filter(
-    (message) =>
-      message.senderType === req.user.role || req.user.role === "admin"
-  );
-
-  sendSuccessResponse(res, filteredMessages, 200);
+  sendSuccessResponse(res, messages, 200);
 });
 // sendSupportMessage (admin,seller, customer)
 const sendSupportMessage = asyncHandler(async (req, res, next) => {
   const user = req.user;
 
-  console.log(user);
-  let supportChatsPath = "SupportChat" + "/" + req.user.email.split(".")[0];
+  let supportChatsPath;
   if (user.role === "admin") {
-    supportChatsPath = "SupportChat" + "/" + req.query.supportId;
-  }
-  if (!req.body.message) {
-    return next(new ApiError("Please Provide Message", 400));
+    if (!req.query.chatId) {
+      return next(new ApiError("Please Provide ChatId", 400));
+    }
+    supportChatsPath = `SupportChat/${req.query.chatId}`;
+  } else {
+    supportChatsPath = `SupportChat/${user.email.split(".")[0]}`;
   }
   const newMessage = {
     message: req.body.message,
-    senderName: user.name,
+
     senderType: user.role,
   };
   await addMessage(supportChatsPath, newMessage);
 
-  sendSuccessResponse(res, { message: "el miksiki admin" }, 200);
+  sendSuccessResponse(res, { message: "Send Successfully" }, 200);
 });
 
 // getMyShopChats (seller)
 const getMyShopChats = asyncHandler(async (req, res, next) => {
   const user = req.user;
-  const shopChatsPath = "ShopChat" + "/" + user.shopName;
+  const shopChatsPath = `ShopChat/${user.shopName}`;
   const shopChats = await getMessages(shopChatsPath);
 
   if (!shopChats) {
@@ -102,13 +87,13 @@ const getMyShopChats = asyncHandler(async (req, res, next) => {
 
   let chats = [];
 
-  chatsIds.map(async (shopId) => {
-    const MessagesIds = Object.keys(shopChats[shopId]);
+  chatsIds.map(async (chatId) => {
+    const MessagesIds = Object.keys(shopChats[chatId]);
     const lastMessageId = MessagesIds[MessagesIds.length - 1];
 
-    const lastMessage = shopChats[shopId][lastMessageId];
+    const lastMessage = shopChats[chatId][lastMessageId];
 
-    const obj = { shopId, lastMessage };
+    const obj = { chatId, lastMessage };
 
     chats.unshift(obj);
   });
@@ -118,40 +103,49 @@ const getMyShopChats = asyncHandler(async (req, res, next) => {
 // getShopMessages (seller, customer)
 const getShopMessages = asyncHandler(async (req, res, next) => {
   const user = req.user;
+
+  let shopChatsPath;
   if (user.role === "seller") {
-    return next(new ApiError("Unauthorized access", 401));
+    if (!req.query.chatId) {
+      return next(new ApiError("Please Provide ChatId", 400));
+    }
+    shopChatsPath = `ShopChat/${user.shopName}/${req.query.chatId}`;
+  } else {
+    if (!req.query.shopName) {
+      return next(new ApiError("Please Provide shopName", 400));
+    }
+    shopChatsPath = `ShopChat/${req.query.shopName}/${
+      user.email.split(".")[0]
+    }`;
   }
-  const shopChatsPath =
-    "ShopChat" + "/" + user.shopName + "/" + req.params.shopId;
   const shopChats = await getMessages(shopChatsPath);
-  if (!shopChats) {
-    return next(new ApiError("No Shop Chats Found ", 404));
-  }
-
-  const messages = Object.values(shopChats);
-  console.log(req.user);
-  const filteredMessages = messages.filter(
-    (message) => message.senderType === req.user.role
-  );
-
-  sendSuccessResponse(res, filteredMessages, 200);
+  const message = Object.values(shopChats);
+  sendSuccessResponse(res, message, 200);
 });
 // sendShopMessage (seller, customer)
 const sendShopMessage = asyncHandler(async (req, res, next) => {
   const user = req.user;
-  console.log(user);
-  const shopChatsPath =
-    "ShopChat" + "/" + user.shopName + "/" + req.user.email.split(".")[0];
-  if (!req.body.message) {
-    return next(new ApiError("Please Provide Message", 400));
+  let shopChatsPath;
+  if (user.role === "seller") {
+    if (!req.query.chatId) {
+      return next(new ApiError("Please Provide ChatId", 400));
+    }
+    shopChatsPath = `ShopChat/${user.shopName}/${req.query.chatId}`;
+  } else {
+    if (!req.query.shopName) {
+      return next(new ApiError("Please Provide shopName", 400));
+    }
+    shopChatsPath = `ShopChat/${req.query.shopName}/${
+      user.email.split(".")[0]
+    }`;
   }
+
   const newMessage = {
     message: req.body.message,
-    senderName: user.name,
     senderType: user.role,
   };
   await addMessage(shopChatsPath, newMessage);
-  sendSuccessResponse(res, { message: "el miksiki seller" }, 200);
+  sendSuccessResponse(res, { message: "Send Successfully" }, 200);
 });
 module.exports = {
   getAllSupportChats,
