@@ -14,37 +14,24 @@ const getAllSupportChats = asyncHandler(async (req, res, next) => {
     return next(new ApiError("No support chats found", 404));
   }
 
-  //   let chats = [];
-  const chatsId = Object.keys(supportChats);
-  const chats = await chatsId.map(async (ch) => {
-    const lastMessageId = Object.keys(ch);
-    console.log("Ccc", ch);
-    console.log("LLAAASSTTT", lastMessageId);
-    //     const lastMessage = await getMessages(`SupportChat/${ch}`, 1);
-    //     console.log("LAAASSSTT", lastMessage);
-    //     console.log("Ccc", ch);
-    //     return {
-    //       chatName: ch,
-    //       lastMessage,
-    //     };
+  const chatsIds = Object.keys(supportChats);
+
+  let chats = [];
+
+  chatsIds.map(async (chatId) => {
+    const MessagesIds = Object.keys(supportChats[chatId]);
+    const lastMessageId = MessagesIds[MessagesIds.length - 1];
+
+    const lastMessage = supportChats[chatId][lastMessageId];
+
+    const obj = { chatId, lastMessage };
+
+    chats.unshift(obj);
   });
-  //   const chats = await customize(chatsId);
-  console.log("CHHHHHAAATTT", chats);
+
   sendSuccessResponse(res, chats, 200);
 });
 
-// const customize = async (chatsId) => {
-//   const chats = await chatsId.map(async (ch) => {
-//     const lastMessage = await getMessages(`SupportChat/${ch}`, 1);
-//     console.log("LAAASSSTT", lastMessage);
-//     console.log("Ccc", ch);
-//     return {
-//       chatName: ch,
-//       lastMessage,
-//     };
-//   });
-//   return chats;
-// };
 // getSupportMessages (admin, seller, customer)
 
 // sendSupportMessage (admin,seller, customer)
