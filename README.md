@@ -30,7 +30,7 @@
 - Respond to Customer Inquiries (Seller)
 - Contact Support (Customer and Seller)
 - Manage Support Requests (Admin)
-- Monitor all Chats in System (Admin)
+- Monitor User Messages (Admin)
 
 ## Users accounts for testing purposes:
 
