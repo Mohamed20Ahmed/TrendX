@@ -6,6 +6,7 @@ const {
   getMyShopChats,
   getShopMessages,
   sendShopMessage,
+  getShopsNames,
 } = require("../controllers/chatController");
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
 const { sendMessageValidator } = require("../validators/chatValidator");
@@ -15,9 +16,10 @@ router.use(protect);
 router.get("/support", allowedTo("admin"), getAllSupportChats);
 router.get("/support/message", getSupportMessages);
 router.post("/support/message", sendMessageValidator, sendSupportMessage);
+router.get("/shop/shopNames", allowedTo("admin"), getShopsNames);
 
-router.get("/shop", allowedTo("seller"), getMyShopChats);
-router.get("/shop/message", allowedTo("seller", "customer"), getShopMessages);
+router.get("/shop", allowedTo("seller", "admin"), getMyShopChats);
+router.get("/shop/message", getShopMessages);
 router.post(
   "/shop/message",
   allowedTo("seller", "customer"),

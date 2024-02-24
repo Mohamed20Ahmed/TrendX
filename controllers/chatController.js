@@ -8,11 +8,15 @@ const { sendSuccessResponse } = require("../utils/responseHandler");
 const getAllSupportChats = asyncHandler(async (req, res, next) => {
   const supportChatsPath = "SupportChat";
   const supportChats = await getMessages(supportChatsPath);
-
   if (!supportChats) {
     return next(new ApiError("No support chats found", 404));
   }
 
+  Object.keys(supportChats).forEach((key) => {
+    const newKey = `${key}.com`;
+    supportChats[newKey] = supportChats[key];
+    delete supportChats[key];
+  });
   const chatsIds = Object.keys(supportChats);
 
   let chats = [];
@@ -42,7 +46,7 @@ const getSupportMessages = asyncHandler(async (req, res, next) => {
   } else {
     supportChatsPath = `SupportChat/${user.email.split(".")[0]}`;
   }
-  const supportChats = await getMessages(supportChatsPath);
+  let supportChats = await getMessages(supportChatsPath);
 
   if (!supportChats) {
     return next(new ApiError("No support chats found", 404));
@@ -74,15 +78,44 @@ const sendSupportMessage = asyncHandler(async (req, res, next) => {
   sendSuccessResponse(res, { message: "Send Successfully" }, 200);
 });
 
-// getMyShopChats (seller)
-const getMyShopChats = asyncHandler(async (req, res, next) => {
-  const user = req.user;
-  const shopChatsPath = `ShopChat/${user.shopName}`;
+// getShopsNames (admin only)
+const getShopsNames = asyncHandler(async (req, res, next) => {
+  const shopChatsPath = `ShopChat/`;
   const shopChats = await getMessages(shopChatsPath);
 
   if (!shopChats) {
     return next(new ApiError("No Shop Chats Found ", 404));
   }
+
+  const shopNames = Object.keys(shopChats);
+  console.log(shopNames);
+  sendSuccessResponse(res, shopNames, 200);
+});
+
+// getMyShopChats (seller)
+const getMyShopChats = asyncHandler(async (req, res, next) => {
+  const user = req.user;
+  let shopChatsPath;
+  if (user.role === "seller") {
+    shopChatsPath = `ShopChat/${user.shopName}`;
+  } else {
+    if (!req.query.shopName) {
+      return next(new ApiError("Please Provide shopName", 400));
+    }
+    shopChatsPath = `ShopChat/${req.query.shopName}`;
+  }
+
+  const shopChats = await getMessages(shopChatsPath);
+
+  if (!shopChats) {
+    return next(new ApiError("No Shop Chats Found ", 404));
+  }
+
+  Object.keys(shopChats).forEach((key) => {
+    const newKey = `${key}.com`;
+    shopChats[newKey] = shopChats[key];
+    delete shopChats[key];
+  });
   const chatsIds = Object.keys(shopChats);
 
   let chats = [];
@@ -103,19 +136,26 @@ const getMyShopChats = asyncHandler(async (req, res, next) => {
 // getShopMessages (seller, customer)
 const getShopMessages = asyncHandler(async (req, res, next) => {
   const user = req.user;
-
+  const query = req.query;
   let shopChatsPath;
   if (user.role === "seller") {
-    if (!req.query.chatId) {
+    if (!query.chatId) {
       return next(new ApiError("Please Provide ChatId", 400));
     }
-    shopChatsPath = `ShopChat/${user.shopName}/${req.query.chatId}`;
-  } else {
-    if (!req.query.shopName) {
+    shopChatsPath = `ShopChat/${user.shopName}/${query.chatId}`;
+  } else if (user.role === "customer") {
+    if (!query.shopName) {
       return next(new ApiError("Please Provide shopName", 400));
     }
-    shopChatsPath = `ShopChat/${req.query.shopName}/${
-      user.email.split(".")[0]
+    shopChatsPath = `ShopChat/${query.shopName}/${user.email.split(".")[0]}`;
+  } else {
+    if (!query.shopName || !query.customerEmail) {
+      return next(
+        new ApiError("Please Provide shopName and customerEmail", 400)
+      );
+    }
+    shopChatsPath = `ShopChat/${query.shopName}/${
+      query.customerEmail.split(".")[0]
     }`;
   }
   const shopChats = await getMessages(shopChatsPath);
@@ -154,4 +194,5 @@ module.exports = {
   getMyShopChats,
   getShopMessages,
   sendShopMessage,
+  getShopsNames,
 };
