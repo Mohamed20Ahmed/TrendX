@@ -3,7 +3,7 @@ const router = require("express").Router();
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
 const {
   uploadShopImage,
-  resizeImage,
+  imageStorage,
   getCustomer_S,
   getSeller_S,
   getUserAccount,
@@ -54,7 +54,7 @@ router.patch(
   "/sellers/account",
   allowedTo("seller"),
   uploadShopImage,
-  resizeImage,
+  imageStorage,
   updateSellerValidator,
   updateSellerAccount
 );

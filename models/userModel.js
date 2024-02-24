@@ -55,21 +55,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const setShopImageUrl = (doc) => {
-  if (doc.shopImage) {
-    const shopImageUrL = `${process.env.BASE_URL}/shops/${doc.shopImage}`;
-    doc.shopImage = shopImageUrL;
-  }
-};
-
-userSchema.post("init", (doc) => {
-  setShopImageUrl(doc);
-});
-
-userSchema.post("save", (doc) => {
-  setShopImageUrl(doc);
-});
-
 const userModel = mongoose.model("User", userSchema);
 
 module.exports = userModel;

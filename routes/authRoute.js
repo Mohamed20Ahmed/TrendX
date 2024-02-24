@@ -18,7 +18,7 @@ const {
 } = require("../controllers/authController");
 const {
   uploadShopImage,
-  resizeImage,
+  imageStorage,
 } = require("../controllers/userController");
 
 router.post(
@@ -30,7 +30,7 @@ router.post(
 router.post(
   "/registerAsSeller",
   uploadShopImage,
-  resizeImage,
+  imageStorage,
   registerAsSellerValidator,
   registerAsSeller
 );

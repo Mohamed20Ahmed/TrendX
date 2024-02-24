@@ -1,6 +1,5 @@
 const asyncHandler = require("express-async-handler");
 const uuid = require("uuid");
-const sharp = require("sharp");
 
 const {
   getUserByIdDB,
@@ -9,6 +8,7 @@ const {
   updateUserDB,
   deleteUserDB,
 } = require("../database/userDB");
+const { addFileStorage } = require("../firebase/storage");
 const { hash, compare } = require("../utils/bcryptService");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
@@ -18,18 +18,21 @@ const ApiError = require("../utils/apiError");
 const uploadShopImage = uploadSingleImage("shopImage");
 
 // Image processing
-const resizeImage = asyncHandler(async (req, res, next) => {
+const imageStorage = asyncHandler(async (req, res, next) => {
   const fileName = `shop-${uuid.v4()}-${Date.now()}.jpeg`;
 
   if (req.file) {
-    await sharp(req.file.buffer)
-      .resize(600, 600)
-      .toFormat("jpeg")
-      .jpeg({ quality: 95 })
-      .toFile(`uploads/shops/${fileName}`);
+    const data = {
+      fileName,
+      buffer: req.file.buffer,
+      mimetype: "image/jpeg",
+      folderName: "Shops",
+    };
 
-    req.body.shopImage = fileName;
+    // Save image into our storage
+    req.body.shopImage = await addFileStorage(data);
   }
+
   next();
 });
 
@@ -262,7 +265,7 @@ const uniqueFieldsExistence = async (userData, fields) => {
 
 module.exports = {
   uploadShopImage,
-  resizeImage,
+  imageStorage,
   getCustomer_S,
   getSeller_S,
   getUserAccount,

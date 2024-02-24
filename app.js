@@ -4,6 +4,7 @@ const path = require("path");
 // Third-Party modules
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config();
 const morgan = require("morgan");
 const cors = require("cors");
 
@@ -11,8 +12,6 @@ const cors = require("cors");
 const dbConnection = require("./database/dbConfig");
 const mountRoutes = require("./routes");
 const errorMiddleware = require("./middlewares/errorMiddleware");
-
-dotenv.config();
 
 // Database connection
 dbConnection();
