@@ -13,6 +13,10 @@ const dbConnection = require("./database/dbConfig");
 const mountRoutes = require("./routes");
 const errorMiddleware = require("./middlewares/errorMiddleware");
 
+
+
+
+
 // Database connection
 dbConnection();
 
@@ -33,6 +37,11 @@ app.use(express.static(path.join(__dirname, "uploads")));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+
+
+
+
 
 // Routes
 mountRoutes(app);

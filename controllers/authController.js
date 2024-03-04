@@ -7,6 +7,7 @@ const { sendEmail } = require("../utils/emailService");
 const { jwtGenerator } = require("../utils/jwtService");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const ApiError = require("../utils/apiError");
+const ApiFeatures = require('../utils/apiFeatures');
 
 const createUser = async (data) => {
   const hashedpassword = await hash(data.password);
@@ -223,6 +224,8 @@ const uniqueFieldsExistence = async (fields) => {
   }
 };
 
+
+
 module.exports = {
   registerAsCustomer,
   registerAsSeller,
@@ -230,4 +233,7 @@ module.exports = {
   forgotPassword,
   verifyResetCode,
   resetPassword,
+  
+
+
 };

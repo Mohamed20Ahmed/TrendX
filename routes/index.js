@@ -6,12 +6,24 @@ const authRoute = require("./authRoute");
 const orderRoute = require("./orderRoute");
 const reviewRoute = require("./reviewRoute");
 const chatRoute = require("./chatRoute");
+const productRoute = require('./productRoute');
+const wishlistRoute = require('./wishlistRoute');
+const categoryRoute = require('./categoryRoute');
+
+
+
 const mountRoutes = (app) => {
   app.use("/auth", authRoute);
   app.use("/users", userRoute);
   app.use("/orders", orderRoute);
   app.use("/chats", chatRoute);
   app.use("/reviews", reviewRoute);
+  app.use('/products', productRoute);
+  app.use('/wishlist', wishlistRoute);
+  app.use('/category', categoryRoute);
+
+
+
 
   app.get("/", (req, res) => {
     sendSuccessResponse(res, { message: "Hello form server side!" }, 200);

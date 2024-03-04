@@ -31,6 +31,12 @@ categorySchema.post('save', (doc) => {
   setImageURL(doc);
 });
 
+categorySchema.virtual("categories", {
+  ref: "Category",
+  foreignField: "category",
+  localField: "_id",
+});
+
 // 2- Create model
 const CategoryModel = mongoose.model('Category', categorySchema);
 

@@ -38,6 +38,13 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
+    // wishlist: [
+    //   {
+    //     type: mongoose.Schema.ObjectId,
+    //     ref: 'Product',
+    //   },
+    // ],
+
     address: {
       street: String,
       city: String,
