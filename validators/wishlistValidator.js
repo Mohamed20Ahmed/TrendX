@@ -1,20 +1,26 @@
-const { check } = require('express-validator');
-const validatorMiddleware = require('../middlewares/validatorMiddleware');
+const { check } = require("express-validator");
+const validatorMiddleware = require("../middlewares/validatorMiddleware");
 
+const addToWishlistValidator = [
+  check("id").isMongoId().withMessage("Invalid ID formate"),
 
+  validatorMiddleware,
+];
 
-exports.addToWishlistValidator = [
-    check('id').isMongoId().withMessage('Invalid ID formate'),
-    validatorMiddleware,
+const getwishListValidator = [
+  check("id").isMongoId().withMessage("Invalid ID formate"),
 
-]
+  validatorMiddleware,
+];
 
-exports.getwishListValidator = [
-    check('id').isMongoId().withMessage('Invalid ID formate'),
-    validatorMiddleware,
-  ];
+const deleteFromWishListValidator = [
+  check("id").isMongoId().withMessage("Invalid ID formate"),
 
-exports.deleteFromWishListValidator = [
-    check('id').isMongoId().withMessage('Invalid ID formate'),
-    validatorMiddleware,
-  ];
+  validatorMiddleware,
+];
+
+module.exports = {
+  addToWishlistValidator,
+  getwishListValidator,
+  deleteFromWishListValidator,
+};

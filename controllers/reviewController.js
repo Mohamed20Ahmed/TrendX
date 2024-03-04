@@ -32,8 +32,11 @@ const getReview_S = asyncHandler(async (req, res, next) => {
 
   // get product reviews
 
+  if (req.query.productId) {
+    return next(new ApiError("productId is required", 404));
+  }
+
   req.query.fields = req.query.fields || reviewExcludedFields;
-  req.query.productId = req.query.productId || "*";
 
   const reviews = await getProductReviewsDB(req);
 
