@@ -74,7 +74,7 @@ const createReview = asyncHandler(async (req, res, next) => {
 
   // calcutate newRating after new rate added
   let newRating =
-    (product.ratingsAverage * product.ratingsQuantity + rating) /
+    ((product.ratingsAverage || 0) * product.ratingsQuantity + rating) /
     (product.ratingsQuantity + 1);
 
   newRating = parseFloat(newRating.toFixed(1));
