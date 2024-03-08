@@ -5,7 +5,7 @@ const ApiFeatures = require("../utils/apiFeatures")
 //   return await wishlistModel.findById(id).select(excludedFields);
 // };
 
-const getWhishlistDB = async (field, excludedFields = "") => {
+const getWishlistDB = async (field, excludedFields = "") => {
   return await wishlistModel.findOne(field).select(excludedFields);
 };
 
@@ -52,7 +52,7 @@ module.exports = {
   deleteFromWishlistDB,
   addToWhishlistDB,
   getAllWishlistDB,
-  getWhishlistDB
+  getWishlistDB
 
 
 

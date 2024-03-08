@@ -1,6 +1,5 @@
 const router = require("express").Router({ mergeParams: true });
 const {
-  getwishListValidator,
   addToWishlistValidator,
   deleteFromWishListValidator,
 } = require("../validators/wishlistValidator");
@@ -19,7 +18,7 @@ router.use(protect);
 
 router
   .route("/")
-  .get(allowedTo("customer"), getwishListValidator, getLoggedUserWishlist)
+  .get(allowedTo("customer"), getLoggedUserWishlist)
   .post(allowedTo("customer"), addToWishlistValidator, addProductToWishlist);
 
 router.delete(

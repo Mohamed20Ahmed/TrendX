@@ -91,16 +91,15 @@ const getCategory_S = asyncHandler(async (req, res, next) => {
   
 
   const createCategory = asyncHandler(async (req, res, next) => {
-    const admin = req.user._id;
 
   const { name } = req.body;
 
-  const category = await getCategoryDB({admin, name});
+  const category = await getCategoryDB({ name});
 
   if(category){
     return next(new ApiError("category  is already exist", 400));
   }
-  await createCategoryDB({admin, name});
+  await createCategoryDB({name});
 
   const response = { message: "category created successfully" };
 
@@ -111,9 +110,9 @@ const getCategory_S = asyncHandler(async (req, res, next) => {
   
 
   const deleteCategory = asyncHandler(async (req, res, next) => {
-    const categoryId = req.params.productId;
+    const categoryId = req.params.categoryId;
 
-    const category = await getProductByIdDB(categoryId);
+    const category = await getCategoryByIdDB(categoryId);
     
         if (!category) {
           return next(new ApiError("category not found", 404));

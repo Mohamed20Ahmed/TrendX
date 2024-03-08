@@ -4,26 +4,44 @@ const ApiError = require("../utils/apiError");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 
 const {
-  getWhishlistDB,
+  getWishlistDB,
   getAllWishlistDB,
   addToWhishlistDB,
   deleteFromWishlistDB,
 } = require("../database/wishlistDB");
 
-const { getProductByIdDB } = require("../database/productDB");
 
 const addProductToWishlist = asyncHandler(async (req, res, next) => {
   const customer = req.user._id;
 
-  const wishlist = req.body.productId;
+  const product = req.body.productId;
 
-  const product = await getWhishlistDB({ customer, wishlist });
-  if (product) {
+  const wishlist = await getWishlistDB({ customer });
+
+  if (!wishlist) {
+    // create cart fot logged user with product
+    await addToWhishlistDB({
+      customer,
+      wishlist:[{ product}]
+  
+    });
+  }
+
+  else {
+  const productIndex = wishlist.wishlist.findIndex(
+    (item) =>item.product._id.toString() === product 
+  );
+
+  if (productIndex > -1) {
+
     return next(new ApiError("product is already exist", 400));
   }
-  await addToWhishlistDB({
-    wishlist,
-  });
+  else {
+    // product not exist in cart,  push product to cartItems array
+    wishlist.wishlist.push({ product });
+  } await wishlist.save();} 
+
+  
   const response = { message: "Product added successfully to your wishlist." };
 
   sendSuccessResponse(res, response, 200);
@@ -47,31 +65,41 @@ const addProductToWishlist = asyncHandler(async (req, res, next) => {
 // });
 
 const removeProductFromWishlist = asyncHandler(async (req, res, next) => {
-  const productId = req.params.productId;
-
-  const product = await getProductByIdDB(productId);
-
-  if (!product) {
+  const product = req.params.productId;
+  const customer = req.user._id;
+  const wishlist = await getWishlistDB({ customer });
+  if (!wishlist) {
+    // create cart fot logged user with product
     return next(new ApiError("Product not found in wishlist", 404));
+
   }
 
-  if (product.customer._id.toString() !== req.user._id.toString()) {
-    return next(new ApiError("You cannot delete this product from wishlist"));
-  }
+  else {
+  const productIndex = wishlist.wishlist.findIndex(
+    (item) =>item.product._id.toString() === product 
+  );
 
-  await deleteFromWishlistDB({ _id: product._id });
+  if (productIndex > -1) {
+
+    wishlist.wishlist.splice(productIndex, 1);
+  }
+  else {
+    // product not exist in cart,  push product to cartItems array
+    return next(new ApiError("product doesn't exist", 400));
+  } await wishlist.save();}
+
   const response = { message: "product deleted successfully from wishlist" };
   sendSuccessResponse(res, response, 200);
 });
 
-const getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate("wishlist");
 
-  res.status(200).json({
-    status: "success",
-    results: user.wishlist.length,
-    data: user.wishlist,
-  });
+const getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
+  const customer = req.user._id;
+  const wishlist = await getWishlistDB({customer});
+  const response = { list:wishlist.wishlist};
+  sendSuccessResponse(res, response, 200);
+
+
 });
 
 module.exports = {

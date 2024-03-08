@@ -18,7 +18,7 @@ const getAllCategoriesDB = async ( req) => {
   const documentsCounts = await getCountOfDocument();
 
   // apply api features
-  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
+  const apiFeatures = new ApiFeatures(categoryModel.find(), req.query)
     .paginate(documentsCounts)
     .filter()
     .search("categories")

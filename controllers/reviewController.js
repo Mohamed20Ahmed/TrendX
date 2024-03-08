@@ -32,7 +32,7 @@ const getReview_S = asyncHandler(async (req, res, next) => {
 
   // get product reviews
 
-  if (req.query.productId) {
+  if (!req.query.productId) {
     return next(new ApiError("productId is required", 404));
   }
 
