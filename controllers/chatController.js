@@ -187,6 +187,42 @@ const sendShopMessage = asyncHandler(async (req, res, next) => {
   await addMessage(shopChatsPath, newMessage);
   sendSuccessResponse(res, { message: "Send Successfully" }, 200);
 });
+
+const getMyCustomerChats = asyncHandler(async (req, res, next) => {
+  const user = req.user;
+  const customerEmail = user.email.split(".")[0]; // Assuming the user's email is the customer identifier
+  const shopChatsPath = `ShopChat/`;
+  const allShopChats = await getMessages(shopChatsPath);
+
+  if (!allShopChats) {
+    return next(new ApiError("No Shop Chats Found", 404));
+  }
+
+  let myChats = {};
+  Object.keys(allShopChats).forEach((shopName) => {
+    const shopChats = allShopChats[shopName];
+    Object.keys(shopChats).forEach((chatId) => {
+      const chat = shopChats[chatId];
+      if (chatId === customerEmail) {
+        if (!myChats[shopName]) myChats[shopName] = {};
+
+        // Retrieve last message
+        const MessagesIds = Object.keys(shopChats[chatId]);
+        const lastMessageId = MessagesIds[MessagesIds.length - 1];
+        const lastMessage = shopChats[chatId][lastMessageId];
+
+        myChats[shopName][chatId] = { lastMessage }; // Store the last message
+      }
+    });
+  });
+
+  if (Object.keys(myChats).length === 0) {
+    return next(new ApiError("No Chats Found for Customer", 404));
+  }
+
+  sendSuccessResponse(res, myChats, 200);
+});
+
 module.exports = {
   getAllSupportChats,
   getSupportMessages,
@@ -195,4 +231,5 @@ module.exports = {
   getShopMessages,
   sendShopMessage,
   getShopsNames,
+  getMyCustomerChats,
 };
