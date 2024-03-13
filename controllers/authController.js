@@ -7,7 +7,7 @@ const { sendEmail } = require("../utils/emailService");
 const { jwtGenerator } = require("../utils/jwtService");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const ApiError = require("../utils/apiError");
-const ApiFeatures = require('../utils/apiFeatures');
+const ApiFeatures = require("../utils/apiFeatures");
 
 const createUser = async (data) => {
   const hashedpassword = await hash(data.password);
@@ -91,7 +91,7 @@ const login = asyncHandler(async (req, res, next) => {
     role: user.role,
   });
 
-  sendSuccessResponse(res, { token }, 200);
+  sendSuccessResponse(res, { token, role: user.role }, 200);
 });
 
 const forgotPassword = asyncHandler(async (req, res, next) => {
@@ -224,8 +224,6 @@ const uniqueFieldsExistence = async (fields) => {
   }
 };
 
-
-
 module.exports = {
   registerAsCustomer,
   registerAsSeller,
@@ -233,7 +231,4 @@ module.exports = {
   forgotPassword,
   verifyResetCode,
   resetPassword,
-  
-
-
 };
