@@ -184,6 +184,11 @@ const updateProduct = asyncHandler(async (req, res, next) => {
       return next(new ApiError("product title is already exist", 400));
     }
     }
+
+    const categoryName = await getCategoryDB ({name:category});
+    if (!categoryName){
+      return next(new ApiError(`No category found : ${category}`, 400));
+    }
     
     // Assuming updateProductDB expects productId and an object containing updated fields
     await updateProductDB({_id:productId}, {
@@ -193,7 +198,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
        images,
        imageCover,
        colors,
-       category 
+       category : categoryName._id
        
     });
     const response = { message: "Product updated successfully" };
