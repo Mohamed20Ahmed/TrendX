@@ -9,6 +9,9 @@ const chatRoute = require("./chatRoute");
 const productRoute = require('./productRoute');
 const wishlistRoute = require('./wishlistRoute');
 const categoryRoute = require('./categoryRoute');
+const cartRoute = require('./cartRoute');
+const shopRoute= require('./shopRoute')
+
 
 
 
@@ -21,6 +24,10 @@ const mountRoutes = (app) => {
   app.use('/products', productRoute);
   app.use('/wishlist', wishlistRoute);
   app.use('/category', categoryRoute);
+  app.use('/cart', cartRoute);
+  app.use('/shops', shopRoute);
+
+
 
 
 

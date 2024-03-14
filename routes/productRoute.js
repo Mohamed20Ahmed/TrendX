@@ -25,11 +25,12 @@ router.
 route('/')
 .get(getProductValidator,getProduct_S)
 
+
+
 router.use(protect);
 router
 .route('/')
 .post(allowedTo("seller"),uploadProductImages, imageStorage, createProductValidator, createProduct);
-// .post(allowedTo("seller"), createProductValidator, createProduct);
 
 router
 .route('/:productId')
