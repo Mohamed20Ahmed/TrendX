@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const uuid = require("uuid");
 
+const {getCategoryDB}=require("../database/categoryDB")
 
 const {
     getProductByIdDB,
@@ -10,10 +11,14 @@ const {
     getAllProductsDB,
     getProductDB,
 } = require("../database/productDB");
+
+const {getUsersByRoleDB,getUserDB}=require("../database/userDB")
+
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const { addFileStorage } = require("../firebase/storage");
 const ApiError = require("../utils/apiError");
+
 
 
 
@@ -103,16 +108,49 @@ const getProduct_S = asyncHandler(async (req, res, next) => {
   sendSuccessResponse(res, response, 200);
 });
 
+const getShop_S = asyncHandler(async (req, res, next) => {
+  const sellerIncludedFields = "_id shopName shopAddress shopImage";
+  // get specific seller
 
+  if (req.query.shopName) {
+    const shop = await getUserDB(
+      { shopName: req.query.shopName, role: "seller" },
+      sellerIncludedFields
+    );
+
+    if (!shop) {
+      return next(new ApiError("shop not found", 404));
+    }
+
+    return sendSuccessResponse(res, { shop }, 200);
+  }
+
+  // get all sellers
+  req.query.fields =  sellerIncludedFields;
+
+  const response = await getUsersByRoleDB("seller", req);
+
+  sendSuccessResponse(res, response, 200);
+});
 
 const createProduct = asyncHandler(async (req, res, next) => {
   const sellerId = req.user._id;
+  // const categoryId = req.body.categoryId;
 
-  const { title, price, description, images, imageCover  } = req.body;
-  const product = await getProductDB({seller:sellerId, title});
+  const { title, price, description, images, imageCover,colors , category } = req.body;
+  const product = await getProductDB({seller:sellerId,  title});
+
+
   if(product){
     return next(new ApiError("product title is already exist", 400));
   }
+  const categoryName = await getCategoryDB ({name:category});
+
+  if (!categoryName){
+    return next(new ApiError(`No category found : ${category}`, 400));
+  }
+
+  
   await createProductDB({
     seller:sellerId,
     title,
@@ -120,6 +158,8 @@ const createProduct = asyncHandler(async (req, res, next) => {
     description,
     images,
     imageCover,
+    colors,
+    category : categoryName._id
   });
   const response = { message: "product created successfully" };
 
@@ -136,7 +176,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
     if (!oldProduct) {
         return next(new ApiError("Product not exists"));
     }
-    const { title, price, description, images, imageCover  } = req.body;
+    const { title, price, description, images, imageCover,colors ,category } = req.body;
 
     if(title){
     const product = await getProductDB({seller:sellerId, title});
@@ -151,7 +191,9 @@ const updateProduct = asyncHandler(async (req, res, next) => {
       price, 
       description,
        images,
-       imageCover 
+       imageCover,
+       colors,
+       category 
        
     });
     const response = { message: "Product updated successfully" };
@@ -183,6 +225,7 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
 
 module.exports = {
   getProduct_S,
+  getShop_S,
   createProduct,
   uploadProductImages,
   imageStorage,

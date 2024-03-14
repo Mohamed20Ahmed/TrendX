@@ -1,6 +1,7 @@
 const { check, body } = require("express-validator");
 const validatorMiddleware = require("../middlewares/validatorMiddleware");
 
+
 exports.createProductValidator = [
   check("title")
     .isLength({ min: 3 })
@@ -10,7 +11,7 @@ exports.createProductValidator = [
   check("description")
     .notEmpty()
     .withMessage("Product description is required")
-    .isLength({ min: 40 })
+    .isLength({ max: 100 })
     .withMessage("Too long description"),
   check("price")
     .notEmpty()
@@ -18,10 +19,19 @@ exports.createProductValidator = [
     .isFloat({ min: 0, max: 200000 })
     .withMessage("Product price must be a number between 0->200000"),
   check("imageCover").notEmpty().withMessage("Product imageCover is required"),
+
   check("images")
     .optional()
     .isArray()
     .withMessage("images should be array of string"),
+
+    check('category')
+    .notEmpty()
+    .isString()
+    .withMessage('Product must be belong to a category'),
+    
+    // .isMongoId()
+    // .withMessage('Invalid ID formate'),
   validatorMiddleware,
 ];
 
@@ -58,6 +68,19 @@ exports.updateProductValidator = [
     .optional()
     .isArray()
     .withMessage("images should be array of string"),
+
+    check("colors")
+    .optional()
+    .isArray()
+    .withMessage("colors should be array of string"),
+    
+
+    check('category')
+    .notEmpty()
+    .isString()
+    .withMessage('Product must be belong to a category'),
+    // .isMongoId()
+    // .withMessage('Invalid ID formate'),
   validatorMiddleware,
 ];
 

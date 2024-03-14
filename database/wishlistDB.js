@@ -18,7 +18,7 @@ const getAllWishlistDB = async ( req) => {
   const documentsCounts = await getCountOfDocument();
 
   // apply api features
-  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
+  const apiFeatures = new ApiFeatures(wishlistModel.find(), req.query)
     .paginate(documentsCounts)
     .filter()
     .search("wishlist")

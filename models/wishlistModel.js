@@ -20,14 +20,10 @@ wishlist: [{ product:
 wishlistSchema.pre(/^find/, function (next) {
 this.populate({
     path: 'wishlist.product',
-    select: 'title description price imageCover'}
+    select: 'title description price imageCover category'}
     );next() })
 
-wishlistSchema.virtual("wishlists", {
-    ref: "Wishlist",
-    foreignField: "wishlist",
-    localField: "_id",
-  });
+
   
   const wishlistModel = mongoose.model("Wishlist", wishlistSchema);
   module.exports = wishlistModel;

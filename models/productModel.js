@@ -21,7 +21,7 @@ const productSchema = new mongoose.Schema(
     description: {
       type: String,
       required: [true, "Product description is required"],
-      minlength: [40, "Too short product description"],
+      minlength: [60, "Too short product description"],
     },
 
     price: {
@@ -41,6 +41,8 @@ const productSchema = new mongoose.Schema(
     },
     images: [String],
 
+    colors: [String],
+
     ratingsAverage: {
       type: Number,
       min: [1, "Rating must be above or equal 1.0"],
@@ -50,20 +52,23 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    category: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Category',
+      required: [true, 'Product must be belong to category'],
+    },
   },
-  {
-    timestamps: true,
-    // to enable virtual populate
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  }
+  {timestamps: true,}
 );
 
-productSchema.virtual("products", {
-  ref: "Product",
-  foreignField: "product",
-  localField: "_id",
+productSchema.pre(/^find/, function (next) {
+  this.populate({ path: "seller", select: "shopName" })
+  .populate({ path: "category", select: "name" });
+
+  next();
 });
+
 
 const productModel = mongoose.model("Product", productSchema);
 module.exports = productModel;
