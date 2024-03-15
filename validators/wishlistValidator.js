@@ -2,7 +2,7 @@ const { check } = require("express-validator");
 const validatorMiddleware = require("../middlewares/validatorMiddleware");
 
 const addToWishlistValidator = [
-  check("productId").isMongoId().withMessage("Invalid ID formate"),
+  check("productId").notEmpty().withMessage("product id is required").isMongoId().withMessage("Invalid ID formate"),
 
   validatorMiddleware,
 ];

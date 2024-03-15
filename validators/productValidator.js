@@ -29,9 +29,12 @@ exports.createProductValidator = [
     .notEmpty()
     .isString()
     .withMessage('Product must be belong to a category'),
+
+    check("colors")
+    .notEmpty()
+    .isArray()
+    .withMessage("colors should be array of string"),
     
-    // .isMongoId()
-    // .withMessage('Invalid ID formate'),
   validatorMiddleware,
 ];
 
@@ -76,7 +79,7 @@ exports.updateProductValidator = [
     
 
     check('category')
-    .notEmpty()
+    .optional()
     .isString()
     .withMessage('Product must be belong to a category'),
     // .isMongoId()

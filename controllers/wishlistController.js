@@ -10,13 +10,19 @@ const {
   deleteFromWishlistDB,
 } = require("../database/wishlistDB");
 
+const{getProductByIdDB}= require("../database/productDB");
+
 
 const addProductToWishlist = asyncHandler(async (req, res, next) => {
   const customer = req.user._id;
 
-  const product = req.body.productId;
+  const product = await getProductByIdDB (req.body.productId);
+  if(!product){
+    return next(new ApiError(`There is no product for this id ${req.body.productId}` , 404));
+  }
 
   const wishlist = await getWishlistDB({ customer });
+  console.log(wishlist)
 
   if (!wishlist) {
     // create cart fot logged user with product
@@ -26,10 +32,9 @@ const addProductToWishlist = asyncHandler(async (req, res, next) => {
   
     });
   }
-
   else {
   const productIndex = wishlist.wishlist.findIndex(
-    (item) =>item.product._id.toString() === product 
+    (item) =>item.product._id.toString() === product._id.toString() 
   );
 
   if (productIndex > -1) {
@@ -85,7 +90,7 @@ const removeProductFromWishlist = asyncHandler(async (req, res, next) => {
   }
   else {
     // product not exist in cart,  push product to cartItems array
-    return next(new ApiError("product doesn't exist", 400));
+    return next(new ApiError("product doesn't exist", 404));
   } await wishlist.save();}
 
   const response = { message: "product deleted successfully from wishlist" };
@@ -96,6 +101,9 @@ const removeProductFromWishlist = asyncHandler(async (req, res, next) => {
 const getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
   const customer = req.user._id;
   const wishlist = await getWishlistDB({customer});
+  if(!wishlist){
+    return next(new ApiError("empty wishlist", 404));
+  }
   const response = { list:wishlist.wishlist};
   sendSuccessResponse(res, response, 200);
 

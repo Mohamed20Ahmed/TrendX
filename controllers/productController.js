@@ -176,7 +176,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
     if (!oldProduct) {
         return next(new ApiError("Product not exists"));
     }
-    const { title, price, description, images, imageCover,colors ,category } = req.body;
+    let { title, price, description, images, imageCover,colors ,category } = req.body;
 
     if(title){
     const product = await getProductDB({seller:sellerId, title});
@@ -185,10 +185,13 @@ const updateProduct = asyncHandler(async (req, res, next) => {
     }
     }
 
+    if(category){
     const categoryName = await getCategoryDB ({name:category});
     if (!categoryName){
       return next(new ApiError(`No category found : ${category}`, 400));
     }
+    category=categoryName._id
+  }
     
     // Assuming updateProductDB expects productId and an object containing updated fields
     await updateProductDB({_id:productId}, {
@@ -198,7 +201,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
        images,
        imageCover,
        colors,
-       category : categoryName._id
+       category 
        
     });
     const response = { message: "Product updated successfully" };
