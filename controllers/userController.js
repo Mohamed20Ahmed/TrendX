@@ -6,7 +6,6 @@ const {
   getUserDB,
   getUsersByRoleDB,
   updateUserDB,
-  deleteUserDB,
 } = require("../database/userDB");
 const { addFileStorage } = require("../firebase/storage");
 const { hash, compare } = require("../utils/bcryptService");
@@ -116,24 +115,6 @@ const updateStatus = asyncHandler(async (req, res, next) => {
   }
 
   const response = { message: "user status updated" };
-
-  sendSuccessResponse(res, response, 200);
-});
-
-const deleteUser = asyncHandler(async (req, res, next) => {
-  const email = req.params.email;
-
-  if (!email) {
-    return next(new ApiError("user email is required", 400));
-  }
-
-  const user = await deleteUserDB({ email });
-
-  if (!user) {
-    return next(new ApiError("user not found", 404));
-  }
-
-  const response = { message: "user deleted successfully" };
 
   sendSuccessResponse(res, response, 200);
 });
@@ -270,7 +251,6 @@ module.exports = {
   getSeller_S,
   getUserAccount,
   updateStatus,
-  deleteUser,
   updateSellerAccount,
   updateCustomerAccount,
   updateAdminAccount,
