@@ -2,13 +2,14 @@ const router = require("express").Router({ mergeParams: true });
 const {
     addToCartValidator,
     deleteFromCartValidator,
+    updateCartValidator
 } = require("../validators/cartValidator");
 
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
 
 const {
     addProductToCart,
-    getLoggedCustomerCart,
+    getCustomerCart_S,
     clearCart,
     removeSpecificCartItem,
     updateCartItemQuantity
@@ -20,11 +21,13 @@ router.use(protect);
 
 router
   .route("/")
-  .get(allowedTo("customer"), getLoggedCustomerCart)
+  .get(allowedTo("customer"), getCustomerCart_S)
   .post(allowedTo("customer"), addToCartValidator, addProductToCart)
-  .delete(allowedTo("customer"),clearCart)
+  .patch(allowedTo("customer"),updateCartValidator,updateCartItemQuantity)
 
-router.delete("/:productId",allowedTo("customer"),deleteFromCartValidator, removeSpecificCartItem)
+router.delete("/:cartId", allowedTo("customer"),clearCart)
+
+router.delete("/item",allowedTo("customer"),deleteFromCartValidator, removeSpecificCartItem)
 
 
 module.exports = router;

@@ -9,12 +9,16 @@ const getCartByIdDB = async (id, excludedFields = "") => {
   return await cartModel.findById(id).select(excludedFields);
 };
 
+const getCountOfDocument = async (field) => {
+  return await cartModel.find(field).countDocuments();
+};
+
 const getAllCartDB = async ( req) => {
   // get count of products to use it in pagination results
-  const documentsCounts = await getCountOfDocument();
+  const documentsCounts = await getCountOfDocument({customer:req.query.customerId});
 
   // apply api features
-  const apiFeatures = new ApiFeatures(cartModel.find(), req.query)
+  const apiFeatures = new ApiFeatures(cartModel.find({customer:req.query.customerId}), req.query)
     .paginate(documentsCounts)
     .sort();
 
@@ -28,18 +32,14 @@ const addToCartDB = async (data) => {
   return await cartModel.create(data);
 };
 
-const updateCartDB = async (field,...opt) => {
-  return await cartModel.findOneAndUpdate(field,...opt);
-  
-};
 
-const deleteCartByIdDB = async (id) => {
-  return await cartModel.findByIdAndDelete(id);
+
+const deleteCartDB = async (field) => {
+  return await cartModel.findOneAndDelete(field);
 };
 
 module.exports = {getCartDB,
    getCartByIdDB,
    getAllCartDB,
    addToCartDB,
-   updateCartDB,
-    deleteCartByIdDB };
+   deleteCartDB };

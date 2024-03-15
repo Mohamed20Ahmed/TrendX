@@ -24,7 +24,7 @@ const mountRoutes = (app) => {
   app.use('/products', productRoute);
   app.use('/wishlist', wishlistRoute);
   app.use('/category', categoryRoute);
-  app.use('/cart', cartRoute);
+  app.use('/carts', cartRoute);
   app.use('/shops', shopRoute);
 
 
