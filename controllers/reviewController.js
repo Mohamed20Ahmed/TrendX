@@ -40,7 +40,7 @@ const getReview_S = asyncHandler(async (req, res, next) => {
 
   const reviews = await getProductReviewsDB(req);
 
-  const response = { reviews };
+  const response = { ...reviews };
 
   sendSuccessResponse(res, response, 200);
 });

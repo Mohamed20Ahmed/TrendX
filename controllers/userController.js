@@ -57,7 +57,9 @@ const getCustomer_S = asyncHandler(async (req, res, next) => {
 
   req.query.fields = req.query.fields || customerExcludedFields;
 
-  const response = await getUsersByRoleDB("customer", req);
+  const customers = await getUsersByRoleDB("customer", req);
+
+  const response = { ...customers };
 
   sendSuccessResponse(res, response, 200);
 });
@@ -83,7 +85,9 @@ const getSeller_S = asyncHandler(async (req, res, next) => {
   // get all sellers
   req.query.fields = req.query.fields || sellerExcludedFields;
 
-  const response = await getUsersByRoleDB("seller", req);
+  const sellers = await getUsersByRoleDB("seller", req);
+
+  const response = { ...sellers };
 
   sendSuccessResponse(res, response, 200);
 });
