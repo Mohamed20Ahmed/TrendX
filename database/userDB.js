@@ -41,15 +41,10 @@ const updateUserDB = async (field, data) => {
   return await userModel.findOneAndUpdate(field, data);
 };
 
-const deleteUserDB = async (field) => {
-  return await userModel.findOneAndDelete(field);
-};
-
 module.exports = {
   getUserByIdDB,
   getUserDB,
   getUsersByRoleDB,
   createUserDB,
   updateUserDB,
-  deleteUserDB,
 };

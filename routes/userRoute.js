@@ -8,7 +8,6 @@ const {
   getSeller_S,
   getUserAccount,
   updateStatus,
-  deleteUser,
   updateSellerAccount,
   updateCustomerAccount,
   updateAdminAccount,
@@ -78,7 +77,5 @@ router.patch(
   updateStatusValidator,
   updateStatus
 );
-
-router.delete("/account/:email", allowedTo("admin"), deleteUser);
 
 module.exports = router;
