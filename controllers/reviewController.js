@@ -27,6 +27,12 @@ const getReview_S = asyncHandler(async (req, res, next) => {
       return next(new ApiError("review not found", 404));
     }
 
+    const product = await getProductByIdDB(review.product);
+
+    if (!product || product.seller.active === false) {
+      return next(new ApiError("Product not found"));
+    }
+
     return sendSuccessResponse(res, { review }, 200);
   }
 
@@ -34,6 +40,12 @@ const getReview_S = asyncHandler(async (req, res, next) => {
 
   if (!req.query.productId) {
     return next(new ApiError("productId is required", 404));
+  }
+
+  const product = await getProductByIdDB(req.query.productId);
+
+  if (!product || product.seller.active === false) {
+    return next(new ApiError("Product not found"));
   }
 
   req.query.fields = req.query.fields || reviewExcludedFields;
@@ -52,7 +64,7 @@ const createReview = asyncHandler(async (req, res, next) => {
 
   const product = await getProductByIdDB(productId);
 
-  if (!product) {
+  if (!product || product.seller.active === false) {
     return next(new ApiError("Product not found"));
   }
 
@@ -104,7 +116,7 @@ const updateReview = asyncHandler(async (req, res, next) => {
 
   const product = await getProductByIdDB(review.product);
 
-  if (!product) {
+  if (!product || product.seller.active === false) {
     return next(new ApiError("Product not found"));
   }
 
@@ -117,7 +129,7 @@ const updateReview = asyncHandler(async (req, res, next) => {
   if (rating) {
     // calcutate newRating after old rate updated
     let newRating =
-      (product.ratingsAverage * product.ratingsQuantity -
+      ((product.ratingsAverage || 0) * product.ratingsQuantity -
         review.rating +
         rating) /
       product.ratingsQuantity;
@@ -145,9 +157,9 @@ const deleteReview = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Review not found"));
   }
 
-  const product = await getProductByIdDB(review.product);
+  let product = await getProductByIdDB(review.product);
 
-  if (!product) {
+  if (!product || product.seller.active === false) {
     return next(new ApiError("Product not found"));
   }
 
@@ -162,13 +174,19 @@ const deleteReview = asyncHandler(async (req, res, next) => {
 
   // calcutate newRating after old rate deleted
   let newRating =
-    (product.ratingsAverage * product.ratingsQuantity - review.rating) /
-    (product.ratingsQuantity - 1);
+    ((product.ratingsAverage || 0) * product.ratingsQuantity - review.rating) /
+    (product.ratingsQuantity - 1 || 1);
 
   newRating = parseFloat(newRating.toFixed(1));
 
-  product.ratingsAverage = newRating;
   product.ratingsQuantity--;
+
+  if (product.ratingsQuantity <= 0) {
+    product.ratingsAverage = undefined;
+    product.ratingsQuantity = 0;
+  } else {
+    product.ratingsAverage = newRating;
+  }
 
   await product.save();
 

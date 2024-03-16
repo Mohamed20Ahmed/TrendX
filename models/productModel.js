@@ -6,7 +6,6 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
       required: true,
-
     },
 
     title: {
@@ -16,7 +15,6 @@ const productSchema = new mongoose.Schema(
       minlength: [3, "Too short product title"],
       maxlength: [100, "Too long product title"],
     },
-    
 
     description: {
       type: String,
@@ -55,20 +53,21 @@ const productSchema = new mongoose.Schema(
 
     category: {
       type: mongoose.Schema.ObjectId,
-      ref: 'Category',
-      required: [true, 'Product must be belong to category'],
+      ref: "Category",
+      required: [true, "Product must be belong to category"],
     },
   },
-  {timestamps: true,}
+  { timestamps: true }
 );
 
 productSchema.pre(/^find/, function (next) {
-  this.populate({ path: "seller", select: "shopName" })
-  .populate({ path: "category", select: "name" });
+  this.populate({ path: "seller", select: "shopName active" }).populate({
+    path: "category",
+    select: "name",
+  });
 
   next();
 });
-
 
 const productModel = mongoose.model("Product", productSchema);
 module.exports = productModel;
