@@ -27,18 +27,7 @@ const uploadCategoryImage = uploadSingleImage([
 
 
 // Image processing
-exports.resizeImage = asyncHandler(async (req, res, next) => {
-
-  // if (req.file) {
-  //   await sharp(req.file.buffer)
-  //     .resize(600, 600)
-  //     .toFormat('jpeg')
-  //     .jpeg({ quality: 95 })
-  //     .toFile(`uploads/categories/${filename}`);
-
-  //   // Save image into our db
-  //   req.body.image = filename;
-  // }
+const imageStorage = asyncHandler(async (req, res, next) => {
   if(req.files){
 
     if (req.files.image) {
@@ -128,4 +117,6 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
     getCategory_S,
     createCategory,
     uploadCategoryImage,
+    imageStorage,
     deleteCategory,
+  }
