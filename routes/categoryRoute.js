@@ -13,8 +13,8 @@ const {
   getCategory_S,
   createCategory,
   deleteCategory,
-  uploadCategoryImage,
-  resizeImage,
+  uploadCategoryImages,
+  categoryStorage,
 } = require('../controllers/categoryController');
 
 // const subcategoriesRoute = require('./subCategoryRoute');
@@ -33,7 +33,7 @@ router.use(protect);
 
 router
   .route('/')
-  .post(allowedTo("admin"),uploadCategoryImage,  createCategoryValidator, createCategory);
+  .post(allowedTo("admin"),uploadCategoryImages,categoryStorage,  createCategoryValidator, createCategory);
 
 router
   .route('/:categoryId')

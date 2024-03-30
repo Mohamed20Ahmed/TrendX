@@ -1,6 +1,8 @@
-const { v4: uuidv4 } = require('uuid');
-const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
+const uuid = require("uuid");
+const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
+const { addFileStorage } = require("../firebase/storage");
+
 
 const asyncHandler = require('express-async-handler');
 // const sharp = require('sharp');
@@ -16,48 +18,31 @@ const {
   deleteCategoryDB
 } = require("../database/categoryDB");
 
-const uploadCategoryImage = uploadSingleImage([
-    {
-      name: 'image',
-    },
-  ]);
 
+const uploadCategoryImages = uploadMixOfImages([
+  {
+    name: 'imageCover',
+    maxCount: 1,
+  },
+]);
 
+const categoryStorage = asyncHandler(async (req, res, next) =>{
+   
+    if(req.files){
 
+      if (req.files.image) {
+        const fileName = `category-${uuid.v4()}-${Date.now()}.jpeg`;
+        const data = {
+          fileName,
+          buffer: req.files.image[0].buffer,
+          mimetype: "image/jpeg",
+          folderName: "Categories",}
 
-// Image processing
-exports.resizeImage = asyncHandler(async (req, res, next) => {
+          req.body.imageCover = await addFileStorage(data);
 
-  // if (req.file) {
-  //   await sharp(req.file.buffer)
-  //     .resize(600, 600)
-  //     .toFormat('jpeg')
-  //     .jpeg({ quality: 95 })
-  //     .toFile(`uploads/categories/${filename}`);
-
-  //   // Save image into our db
-  //   req.body.image = filename;
-  // }
-  if(req.files){
-
-    if (req.files.image) {
-      const fileName = `category-${uuid.v4()}-${Date.now()}.jpeg`;
-      const data = {
-        fileName,
-        buffer: req.files.image.buffer,
-        mimetype: "image/jpeg",
-        folderName: "categories",
-      };
-    
-
-    // Save image into our storage
-    req.body.imageCover = await addFileStorage(data);
-  }
-}
-next();
-
-});
-
+        }}
+        next();
+      });
 
 
 const getCategory_S = asyncHandler(async (req, res, next) => {
@@ -92,14 +77,16 @@ const getCategory_S = asyncHandler(async (req, res, next) => {
 
   const createCategory = asyncHandler(async (req, res, next) => {
 
-  const { name } = req.body;
+  const { name,image } = req.body;
 
   const category = await getCategoryDB({ name});
 
   if(category){
     return next(new ApiError("category  is already exist", 400));
   }
-  await createCategoryDB({name});
+  await createCategoryDB({
+    name,
+    image});
 
   const response = { message: "category created successfully" };
 
@@ -130,7 +117,8 @@ const getCategory_S = asyncHandler(async (req, res, next) => {
   module.exports={
     getCategory_S,
     createCategory,
-    uploadCategoryImage,
+    uploadCategoryImages,
+    categoryStorage,
     deleteCategory,
 
 }
