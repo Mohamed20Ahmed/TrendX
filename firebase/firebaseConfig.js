@@ -3,9 +3,9 @@ const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL:
-    "https://trendx-222b9-default-rtdb.europe-west1.firebasedatabase.app/",
+  databaseURL: "https://trendx-4fd19-default-rtdb.firebaseio.com/",
 });
 
 const realtime = admin.database();
+
 module.exports = { realtime };

@@ -130,7 +130,7 @@ const getActiveProduct_S = asyncHandler(async (req, res, next) => {
   const end = start + limit;
   products = products.slice(start, end);
 
-  const response = { ...products };
+  const response = { products: [...products] };
 
   sendSuccessResponse(res, response, 200);
 });

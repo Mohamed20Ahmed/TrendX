@@ -2,13 +2,12 @@ const asyncHandler = require("express-async-handler");
 
 const ApiError = require("../utils/apiError");
 const { sendSuccessResponse } = require("../utils/responseHandler");
-
 const Product = require("../models/productModel");
 const {
   getProductByIdDB,
   productBulkWriteDB,
 } = require("../database/productDB");
-const { getCartByIdDB, deleteCartByIdDB } = require("../database/cartDB");
+const { getCartByIdDB, deleteCartDB } = require("../database/cartDB");
 const {
   getOrderByIdDB,
   getAllOrdersDB,
@@ -18,15 +17,21 @@ const Cart = require("../models/cartModel");
 
 const createCashOrder = asyncHandler(async (req, res, next) => {
   const cart = await getCartByIdDB(req.params.cartId);
+
   const user = req.user;
+
   if (!cart || cart.customer.toString() !== user._id.toString()) {
     return next(new ApiError("cart not found", 404));
   }
 
-  const product = await getProductByIdDB(cart.cartItems[0].product);
-  const seller = product.sellerId.toString();
+  if (cart.seller.active === false) {
+    return next(new ApiError("cannot proceed this order", 404));
+  }
+
+  const seller = cart.seller._id.toString();
 
   let shippingAddress = req.body.shippingAddress;
+
   if (!shippingAddress) {
     shippingAddress = { phone: user.phoneNumber, address: user.address };
   }
@@ -46,9 +51,10 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
         update: { $inc: { sold: +item.quantity } },
       },
     }));
+
     await productBulkWriteDB(bulkOption, {});
 
-    await deleteCartByIdDB(req.params.cartId);
+    await deleteCartDB({ _id: req.params.cartId });
   }
 
   return sendSuccessResponse(res, { order }, 201);
@@ -56,12 +62,13 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
 
 const getOrder_S = asyncHandler(async (req, res, next) => {
   const orderExcludedFields = "-__v";
+
   const user = req.user;
-  console.log(req.user);
 
   // get specific order
   if (req.query.orderId) {
     const order = await getOrderByIdDB(req.query.orderId, orderExcludedFields);
+
     if (!order || order[user.role]._id.toString() !== user._id.toString()) {
       return next(new ApiError("order not found", 404));
     }
@@ -73,7 +80,9 @@ const getOrder_S = asyncHandler(async (req, res, next) => {
   if (user.role !== "admin") {
     req.query[user.role] = user._id;
   }
+
   req.query.fields = req.query.fields || orderExcludedFields;
+
   const response = await getAllOrdersDB(req);
 
   sendSuccessResponse(res, response, 200);
@@ -81,7 +90,9 @@ const getOrder_S = asyncHandler(async (req, res, next) => {
 
 const updateOrderStatus = asyncHandler(async (req, res, next) => {
   const orderExcludedFields = "-__v";
+
   const user = req.user;
+
   const order = await getOrderByIdDB(req.params.orderId, orderExcludedFields);
 
   if (!order || order[user.role]._id.toString() !== user._id.toString()) {
@@ -94,8 +105,11 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
   }
 
   order.status = req.body.status;
+
   order.shippingPrice = req.body.shippingPrice;
+
   order.changeStatusTime = Date.now();
+
   const updatedOrder = await order.save();
 
   sendSuccessResponse(res, updatedOrder, 201);

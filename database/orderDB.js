@@ -15,7 +15,6 @@ const getAllOrdersDB = async (req) => {
   const apiFeatures = new ApiFeatures(orderModel.find(), req.query)
     .paginate(documentsCounts)
     .filter()
-
     .limitFields()
     .sort();
 

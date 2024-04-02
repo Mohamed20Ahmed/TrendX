@@ -13,17 +13,22 @@ const getCountOfDocument = async (field) => {
   return await cartModel.find(field).countDocuments();
 };
 
-const getAllCartDB = async ( req) => {
+const getAllCartDB = async (req) => {
   // get count of products to use it in pagination results
-  const documentsCounts = await getCountOfDocument({customer:req.query.customerId});
+  const documentsCounts = await getCountOfDocument({
+    customer: req.query.customerId,
+  });
 
   // apply api features
-  const apiFeatures = new ApiFeatures(cartModel.find({customer:req.query.customerId}), req.query)
+  const apiFeatures = new ApiFeatures(
+    cartModel.find({ customer: req.query.customerId }),
+    req.query
+  )
     .paginate(documentsCounts)
     .sort();
 
-    let { mongooseQuery, paginationResult } = apiFeatures;
-    const cart = await mongooseQuery;
+  let { mongooseQuery, paginationResult } = apiFeatures;
+  const cart = await mongooseQuery;
 
   return { paginationResult, cart };
 };
@@ -32,14 +37,14 @@ const addToCartDB = async (data) => {
   return await cartModel.create(data);
 };
 
-
-
 const deleteCartDB = async (field) => {
   return await cartModel.findOneAndDelete(field);
 };
 
-module.exports = {getCartDB,
-   getCartByIdDB,
-   getAllCartDB,
-   addToCartDB,
-   deleteCartDB };
+module.exports = {
+  getCartDB,
+  getCartByIdDB,
+  getAllCartDB,
+  addToCartDB,
+  deleteCartDB,
+};

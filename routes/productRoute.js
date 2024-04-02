@@ -24,7 +24,7 @@ router.use(protect);
 
 router.get(
   "/seller",
-  allowedTo("admin"),
+  allowedTo("seller"),
   getProductValidator,
   getSellerProduct_S
 );

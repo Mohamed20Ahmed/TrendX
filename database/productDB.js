@@ -40,11 +40,11 @@ const getSpecificProductsDB = async (req) => {
     .limitFields()
     .sort();
 
-  let { mongooseQuery, paginationResult } = apiFeatures;
+  let { mongooseQuery } = apiFeatures;
 
   const products = await mongooseQuery;
 
-  return { paginationResult, products };
+  return products;
 };
 
 const createProductDB = async (data) => {
