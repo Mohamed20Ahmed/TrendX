@@ -1,11 +1,7 @@
 const router = require("express").Router({ mergeParams: true });
-const { protect, allowedTo } = require("../middlewares/authMiddleware");
 
-const {getShop_S}= require("../controllers/productController")
+const { getShop_S } = require("../controllers/shopController");
 
+router.route("/").get(getShop_S);
 
-router.
-route('/')
-.get(getShop_S)
-
-module.exports=router
+module.exports = router;

@@ -2,18 +2,15 @@ const asyncHandler = require("express-async-handler");
 const uuid = require("uuid");
 
 const { getCategoryDB } = require("../database/categoryDB");
-
 const {
   getProductByIdDB,
   deleteProductDB,
   updateProductDB,
   createProductDB,
   getAllProductsDB,
+  getSpecificProductsDB,
   getProductDB,
 } = require("../database/productDB");
-
-const { getUsersByRoleDB, getUserDB } = require("../database/userDB");
-
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const { addFileStorage } = require("../firebase/storage");
@@ -71,11 +68,77 @@ const imageStorage = asyncHandler(async (req, res, next) => {
   next();
 });
 
+const getSellerProduct_S = asyncHandler(async (req, res, next) => {
+  const productExcludedFields = "-__v";
+
+  // get specific Product
+  if (req.query.productId) {
+    const product = await getProductDB(
+      { _id: req.query.productId, seller: req.user._id },
+      productExcludedFields
+    );
+
+    if (!product) {
+      return next(new ApiError("Product not found", 404));
+    }
+
+    return sendSuccessResponse(res, { product }, 200);
+  }
+
+  // get all  Products
+
+  req.query.fields = req.query.fields || productExcludedFields;
+
+  req.query.seller = req.user._id;
+
+  const products = await getAllProductsDB(req);
+
+  const response = { ...products };
+
+  sendSuccessResponse(res, response, 200);
+});
+
+const getActiveProduct_S = asyncHandler(async (req, res, next) => {
+  const productExcludedFields = "-__v";
+
+  // get specific Product
+  if (req.query.productId) {
+    const product = await getProductByIdDB(
+      req.query.productId,
+      productExcludedFields
+    );
+
+    if (!product || product.seller.active === false) {
+      return next(new ApiError("Product not found", 404));
+    }
+
+    return sendSuccessResponse(res, { product }, 200);
+  }
+
+  req.query.fields = req.query.fields || productExcludedFields;
+
+  // get all Products
+  let products = await getSpecificProductsDB(req);
+
+  // get only Active Products
+  products = products.filter((product) => product.seller.active === true);
+
+  // apply pagination
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 50;
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  products = products.slice(start, end);
+
+  const response = { ...products };
+
+  sendSuccessResponse(res, response, 200);
+});
+
 const getProduct_S = asyncHandler(async (req, res, next) => {
   const productExcludedFields = "-__v";
 
   // get specific Product
-
   if (req.query.productId) {
     const product = await getProductByIdDB(
       req.query.productId,
@@ -100,44 +163,18 @@ const getProduct_S = asyncHandler(async (req, res, next) => {
   sendSuccessResponse(res, response, 200);
 });
 
-const getShop_S = asyncHandler(async (req, res, next) => {
-  const sellerIncludedFields = "_id shopName shopAddress shopImage";
-  // get specific seller
-
-  if (req.query.shopName) {
-    const shop = await getUserDB(
-      { shopName: req.query.shopName, role: "seller" },
-      sellerIncludedFields
-    );
-
-    if (!shop) {
-      return next(new ApiError("shop not found", 404));
-    }
-
-    return sendSuccessResponse(res, { shop }, 200);
-  }
-
-  // get all sellers
-  req.query.fields = sellerIncludedFields;
-
-  const shops = await getUsersByRoleDB("seller", req);
-
-  const response = { ...shops };
-
-  sendSuccessResponse(res, response, 200);
-});
-
 const createProduct = asyncHandler(async (req, res, next) => {
   const sellerId = req.user._id;
-  // const categoryId = req.body.categoryId;
 
   const { title, price, description, images, imageCover, colors, category } =
     req.body;
+
   const product = await getProductDB({ seller: sellerId, title });
 
   if (product) {
     return next(new ApiError("product title is already exist", 400));
   }
+
   const categoryName = await getCategoryDB({ name: category });
 
   if (!categoryName) {
@@ -154,6 +191,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
     colors,
     category: categoryName._id,
   });
+
   const response = { message: "product created successfully" };
 
   sendSuccessResponse(res, response, 201);
@@ -161,17 +199,21 @@ const createProduct = asyncHandler(async (req, res, next) => {
 
 const updateProduct = asyncHandler(async (req, res, next) => {
   const sellerId = req.user._id;
-  const productId = req.params.productId; // corrected variable name
+
+  const productId = req.params.productId;
+
   const oldProduct = await getProductDB({ _id: productId, seller: sellerId });
 
   if (!oldProduct) {
     return next(new ApiError("Product not exists"));
   }
+
   let { title, price, description, images, imageCover, colors, category } =
     req.body;
 
   if (title) {
     const product = await getProductDB({ seller: sellerId, title });
+
     if (product && product.title !== oldProduct.title) {
       return next(new ApiError("product title is already exist", 400));
     }
@@ -179,9 +221,11 @@ const updateProduct = asyncHandler(async (req, res, next) => {
 
   if (category) {
     const categoryName = await getCategoryDB({ name: category });
+
     if (!categoryName) {
       return next(new ApiError(`No category found : ${category}`, 400));
     }
+
     category = categoryName._id;
   }
 
@@ -198,7 +242,9 @@ const updateProduct = asyncHandler(async (req, res, next) => {
       category,
     }
   );
+
   const response = { message: "Product updated successfully" };
+
   sendSuccessResponse(res, response, 200);
 });
 
@@ -219,13 +265,16 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
   }
 
   await deleteProductDB({ _id: product._id });
+
   const response = { message: "product deleted successfully" };
+
   sendSuccessResponse(res, response, 200);
 });
 
 module.exports = {
   getProduct_S,
-  getShop_S,
+  getSellerProduct_S,
+  getActiveProduct_S,
   createProduct,
   uploadProductImages,
   imageStorage,

@@ -1,33 +1,28 @@
 const router = require("express").Router({ mergeParams: true });
-const {
-    addToCartValidator,
-    deleteFromCartValidator,
-    updateCartValidator
-} = require("../validators/cartValidator");
 
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
-
 const {
-    addProductToCart,
-    getCustomerCart_S,
-    clearCart,
-    removeSpecificCartItem,
-    updateCartItemQuantity
+  addToCartValidator,
+  deleteFromCartValidator,
+  updateCartValidator,
+} = require("../validators/cartValidator");
+const {
+  addProductToCart,
+  getCustomerCart_S,
+  clearCart,
+  removeSpecificCartItem,
+  updateCartItemQuantity,
 } = require("../controllers/cartController");
 
-// Use the middleware function in a route
-
-router.use(protect);
+router.use(protect, allowedTo("customer"));
 
 router
   .route("/")
-  .get(allowedTo("customer"), getCustomerCart_S)
-  .post(allowedTo("customer"), addToCartValidator, addProductToCart)
-  .patch(allowedTo("customer"),updateCartValidator,updateCartItemQuantity)
+  .get(getCustomerCart_S)
+  .post(addToCartValidator, addProductToCart)
+  .patch(updateCartValidator, updateCartItemQuantity)
+  .delete(deleteFromCartValidator, removeSpecificCartItem);
 
-router.delete("/:cartId", allowedTo("customer"),clearCart)
-
-router.delete("/item",allowedTo("customer"),deleteFromCartValidator, removeSpecificCartItem)
-
+router.delete("/:cartId", clearCart);
 
 module.exports = router;

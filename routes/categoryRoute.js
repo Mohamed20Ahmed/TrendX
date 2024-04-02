@@ -1,43 +1,31 @@
-const express = require('express');
+const router = require("express").Router();
 
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
-
-
 const {
   getCategoryValidator,
   createCategoryValidator,
   deleteCategoryValidator,
-} = require('../validators/categoryValidator');
-
+} = require("../validators/categoryValidator");
 const {
   getCategory_S,
   createCategory,
   deleteCategory,
   uploadCategoryImage,
   imageStorage,
-} = require('../controllers/categoryController');
+} = require("../controllers/categoryController");
 
-// const subcategoriesRoute = require('./subCategoryRoute');
+router.get("/", getCategoryValidator, getCategory_S);
 
-const router = express.Router();
+router.use(protect, allowedTo("admin"));
 
-// Nested route
-// router.use('/:categoryId/subcategories', subcategoriesRoute);
-router
-.route('/')
-.get(getCategoryValidator,getCategory_S);
+router.post(
+  "/",
+  uploadCategoryImage,
+  imageStorage,
+  createCategoryValidator,
+  createCategory
+);
 
-  
-
-router.use(protect);
-
-router
-  .route('/')
-  .post(allowedTo("admin"),uploadCategoryImage,imageStorage,  createCategoryValidator, createCategory);
-
-router
-  .route('/:categoryId')
-  .delete(allowedTo("admin"), deleteCategoryValidator, deleteCategory);
-
+router.delete("/:categoryId", deleteCategoryValidator, deleteCategory);
 
 module.exports = router;

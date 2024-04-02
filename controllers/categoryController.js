@@ -1,16 +1,12 @@
 const uuid = require("uuid");
-const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
+const asyncHandler = require("express-async-handler");
+
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const { addFileStorage } = require("../firebase/storage");
-
-
-const asyncHandler = require("express-async-handler");
-// const sharp = require('sharp');
 const ApiError = require("../utils/apiError");
-
 const {
   getCategoryByIdDB,
-  // updateCategoryDB,
   createCategoryDB,
   getAllCategoriesDB,
   getCategoryDB,
@@ -38,8 +34,6 @@ const imageStorage = asyncHandler(async (req, res, next) => {
 
   next();
 });
-
-
 
 const getCategory_S = asyncHandler(async (req, res, next) => {
   const categoryExcludedFields = "-__v";
@@ -70,18 +64,19 @@ const getCategory_S = asyncHandler(async (req, res, next) => {
   sendSuccessResponse(res, response, 200);
 });
 
-  const createCategory = asyncHandler(async (req, res, next) => {
-
-  const { name,image } = req.body;
+const createCategory = asyncHandler(async (req, res, next) => {
+  const { name, image } = req.body;
 
   const category = await getCategoryDB({ name });
 
   if (category) {
-    return next(new ApiError("category  is already exist", 400));
+    return next(new ApiError("category is already exist", 400));
   }
+
   await createCategoryDB({
     name,
-    image});
+    image,
+  });
 
   const response = { message: "category created successfully" };
 
@@ -91,25 +86,23 @@ const getCategory_S = asyncHandler(async (req, res, next) => {
 const deleteCategory = asyncHandler(async (req, res, next) => {
   const categoryId = req.params.categoryId;
 
-    const category = await getCategoryByIdDB(categoryId);
-    
-        if (!category) {
-          return next(new ApiError("category not found", 404));
-        };
-  
-    if (req.user.role !== "admin") {
-      return next(new ApiError("You cannot delete this categoory"));
-    }
-  
-    await deleteCategoryDB({ _id: category._id });  
-    const response = { message: "category deleted successfully" };
-    sendSuccessResponse(res, response, 200);
-  });
-  
-  module.exports={
-    getCategory_S,
-    createCategory,
-    uploadCategoryImage,
-    imageStorage,
-    deleteCategory,
+  const category = await getCategoryByIdDB(categoryId);
+
+  if (!category) {
+    return next(new ApiError("category not found", 404));
   }
+
+  await deleteCategoryDB({ _id: category._id });
+
+  const response = { message: "category deleted successfully" };
+
+  sendSuccessResponse(res, response, 200);
+});
+
+module.exports = {
+  getCategory_S,
+  createCategory,
+  uploadCategoryImage,
+  imageStorage,
+  deleteCategory,
+};

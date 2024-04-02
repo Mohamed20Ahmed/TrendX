@@ -1,5 +1,5 @@
 const productModel = require("../models/productModel");
-const ApiFeatures = require("../utils/apiFeatures")
+const ApiFeatures = require("../utils/apiFeatures");
 
 const getProductByIdDB = async (id, excludedFields = "") => {
   return await productModel.findById(id).select(excludedFields);
@@ -13,7 +13,7 @@ const getCountOfDocument = async (field) => {
   return await productModel.find(field).countDocuments();
 };
 
-const getAllProductsDB = async ( req) => {
+const getAllProductsDB = async (req) => {
   // get count of products to use it in pagination results
   const documentsCounts = await getCountOfDocument();
 
@@ -25,19 +25,27 @@ const getAllProductsDB = async ( req) => {
     .limitFields()
     .sort();
 
-    let { mongooseQuery, paginationResult } = apiFeatures;
-
-   
-
-  // result from api features
-  // const { mongooseQuery, paginationResult } = apiFeatures;
+  let { mongooseQuery, paginationResult } = apiFeatures;
 
   const products = await mongooseQuery;
 
   return { paginationResult, products };
 };
 
+const getSpecificProductsDB = async (req) => {
+  // apply api features
+  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
+    .filter()
+    .search("products")
+    .limitFields()
+    .sort();
 
+  let { mongooseQuery, paginationResult } = apiFeatures;
+
+  const products = await mongooseQuery;
+
+  return { paginationResult, products };
+};
 
 const createProductDB = async (data) => {
   return await productModel.create(data);
@@ -62,8 +70,6 @@ module.exports = {
   updateProductDB,
   createProductDB,
   getAllProductsDB,
-  getProductDB
-
-
-
+  getSpecificProductsDB,
+  getProductDB,
 };
