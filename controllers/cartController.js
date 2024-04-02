@@ -52,7 +52,7 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
 
   const product = await getProductByIdDB(productId);
 
-  if (!product) {
+  if (!product || product.seller.active === false) {
     return next(new ApiError("product not exists", 404));
   }
 

@@ -9,6 +9,8 @@ const {
 } = require("../validators/productValidator");
 const {
   getProduct_S,
+  getSellerProduct_S,
+  getActiveProduct_S,
   createProduct,
   imageStorage,
   uploadProductImages,
@@ -16,18 +18,20 @@ const {
   deleteProduct,
 } = require("../controllers/productController");
 
-//get all products for admin (admin)
-
-// get only active seller's products for customers and users (all)
-
-// get epecific products for all shops (seller)
+router.get("/active", getProductValidator, getActiveProduct_S);
 
 router.use(protect);
 
-router.route("/").get(allowedTo("admin"), getProductValidator, getProduct_S);
+router.get(
+  "/seller",
+  allowedTo("admin"),
+  getProductValidator,
+  getSellerProduct_S
+);
 
 router
   .route("/")
+  .get(allowedTo("admin"), getProductValidator, getProduct_S)
   .post(
     allowedTo("seller"),
     uploadProductImages,

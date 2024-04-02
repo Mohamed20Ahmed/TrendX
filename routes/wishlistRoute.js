@@ -14,16 +14,15 @@ const {
 
 // Use the middleware function in a route
 
-router.use(protect);
+router.use(protect, allowedTo("customer"));
 
 router
   .route("/")
-  .get(allowedTo("customer"), getLoggedUserWishlist)
-  .post(allowedTo("customer"), addToWishlistValidator, addProductToWishlist);
+  .get(getLoggedUserWishlist)
+  .post(addToWishlistValidator, addProductToWishlist);
 
 router.delete(
   "/:productId",
-  allowedTo("customer"),
   deleteFromWishListValidator,
   removeProductFromWishlist
 );
