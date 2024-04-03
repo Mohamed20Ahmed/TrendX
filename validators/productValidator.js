@@ -38,11 +38,6 @@ const createProductValidator = [
     .isString()
     .withMessage("Product must be belong to a category"),
 
-  check("colors")
-    .notEmpty()
-    .isArray()
-    .withMessage("colors should be array of string"),
-
   validatorMiddleware,
 ];
 
@@ -79,11 +74,6 @@ const updateProductValidator = [
     .optional()
     .isArray()
     .withMessage("images should be array of string"),
-
-  check("colors")
-    .optional()
-    .isArray()
-    .withMessage("colors should be array of string"),
 
   check("category")
     .optional()

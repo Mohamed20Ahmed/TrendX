@@ -6,14 +6,12 @@ const authRoute = require("./authRoute");
 const orderRoute = require("./orderRoute");
 const reviewRoute = require("./reviewRoute");
 const chatRoute = require("./chatRoute");
-const productRoute = require('./productRoute');
-const wishlistRoute = require('./wishlistRoute');
-const categoryRoute = require('./categoryRoute');
-const cartRoute = require('./cartRoute');
-const shopRoute= require('./shopRoute')
-
-
-
+const productRoute = require("./productRoute");
+const wishlistRoute = require("./wishlistRoute");
+const categoryRoute = require("./categoryRoute");
+const cartRoute = require("./cartRoute");
+const shopRoute = require("./shopRoute");
+const chatgpt = require("./chatgptRoute");
 
 const mountRoutes = (app) => {
   app.use("/auth", authRoute);
@@ -21,16 +19,12 @@ const mountRoutes = (app) => {
   app.use("/orders", orderRoute);
   app.use("/chats", chatRoute);
   app.use("/reviews", reviewRoute);
-  app.use('/products', productRoute);
-  app.use('/wishlist', wishlistRoute);
-  app.use('/category', categoryRoute);
-  app.use('/carts', cartRoute);
-  app.use('/shops', shopRoute);
-
-
-
-
-
+  app.use("/products", productRoute);
+  app.use("/wishlist", wishlistRoute);
+  app.use("/category", categoryRoute);
+  app.use("/carts", cartRoute);
+  app.use("/shops", shopRoute);
+  app.use("/chatbot", chatgpt);
 
   app.get("/", (req, res) => {
     sendSuccessResponse(res, { message: "Hello form server side!" }, 200);

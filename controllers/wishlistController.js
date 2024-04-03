@@ -10,11 +10,7 @@ const getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
 
   const wishlist = await getWishlistDB({ customer });
 
-  if (!wishlist) {
-    return next(new ApiError("empty wishlist", 404));
-  }
-
-  const response = { list: wishlist.wishlist };
+  const response = { wishlist: wishlist ? wishlist.wishlist : [] };
 
   sendSuccessResponse(res, response, 200);
 });

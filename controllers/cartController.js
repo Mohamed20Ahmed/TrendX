@@ -48,16 +48,12 @@ const getCustomerCart_S = asyncHandler(async (req, res, next) => {
 });
 
 const addProductToCart = asyncHandler(async (req, res, next) => {
-  const { productId, color } = req.body;
+  const { productId } = req.body;
 
   const product = await getProductByIdDB(productId);
 
   if (!product || product.seller.active === false) {
     return next(new ApiError("product not exists", 404));
-  }
-
-  if (product.colors.indexOf(color) == -1) {
-    return next(new ApiError("select from available colors", 404));
   }
 
   // 1) Get Cart for logged user
@@ -71,13 +67,12 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
     cart = await addToCartDB({
       customer: req.user._id,
       seller: product.seller,
-      cartItems: [{ product: productId, color, price: product.price }],
+      cartItems: [{ product: productId, price: product.price }],
     });
   } else {
     // product exist in cart, update product quantity
     const productIndex = cart.cartItems.findIndex(
-      (item) =>
-        item.product._id.toString() === productId && item.color === color
+      (item) => item.product._id.toString() === productId
     );
 
     if (productIndex > -1) {
@@ -87,7 +82,7 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
       cart.cartItems[productIndex] = cartItem;
     } else {
       // product not exist in cart,  push product to cartItems array
-      cart.cartItems.push({ product: productId, color, price: product.price });
+      cart.cartItems.push({ product: productId, price: product.price });
     }
   }
 

@@ -39,8 +39,6 @@ const productSchema = new mongoose.Schema(
     },
     images: [String],
 
-    colors: [String],
-
     ratingsAverage: {
       type: Number,
       min: [1, "Rating must be above or equal 1.0"],

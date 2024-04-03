@@ -166,8 +166,7 @@ const getProduct_S = asyncHandler(async (req, res, next) => {
 const createProduct = asyncHandler(async (req, res, next) => {
   const sellerId = req.user._id;
 
-  const { title, price, description, images, imageCover, colors, category } =
-    req.body;
+  const { title, price, description, images, imageCover, category } = req.body;
 
   const product = await getProductDB({ seller: sellerId, title });
 
@@ -188,7 +187,6 @@ const createProduct = asyncHandler(async (req, res, next) => {
     description,
     images,
     imageCover,
-    colors,
     category: categoryName._id,
   });
 
@@ -208,8 +206,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Product not exists"));
   }
 
-  let { title, price, description, images, imageCover, colors, category } =
-    req.body;
+  let { title, price, description, images, imageCover, category } = req.body;
 
   if (title) {
     const product = await getProductDB({ seller: sellerId, title });
@@ -238,7 +235,6 @@ const updateProduct = asyncHandler(async (req, res, next) => {
       description,
       images,
       imageCover,
-      colors,
       category,
     }
   );

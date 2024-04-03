@@ -3,27 +3,30 @@ const validatorMiddleware = require("../middlewares/validatorMiddleware");
 
 const addToCartValidator = [
   check("productId").isMongoId().withMessage("Invalid ID formate"),
-  check("color","color is required and must be string").notEmpty().isString(),
 
   validatorMiddleware,
 ];
 
 const updateCartValidator = [
-    check("cartId").isMongoId().withMessage("Invalid ID formate")
-    ,check("itemId").isMongoId().withMessage("Invalid ID formate")
-    ,check("type").notEmpty().withMessage("type is required").isIn(["+", "-"]).withMessage("type must be '+' or '-'"),
+  check("cartId").isMongoId().withMessage("Invalid ID formate"),
+  check("itemId").isMongoId().withMessage("Invalid ID formate"),
+  check("type")
+    .notEmpty()
+    .withMessage("type is required")
+    .isIn(["+", "-"])
+    .withMessage("type must be '+' or '-'"),
 
-    validatorMiddleware,
-  ];
+  validatorMiddleware,
+];
 
 const deleteFromCartValidator = [
-    check("cartId").isMongoId().withMessage("Invalid ID formate")
-    ,check("itemId").isMongoId().withMessage("Invalid ID formate"),
+  check("cartId").isMongoId().withMessage("Invalid ID formate"),
+  check("itemId").isMongoId().withMessage("Invalid ID formate"),
   validatorMiddleware,
 ];
 
 module.exports = {
-    addToCartValidator,
-    deleteFromCartValidator,
-    updateCartValidator
+  addToCartValidator,
+  deleteFromCartValidator,
+  updateCartValidator,
 };
