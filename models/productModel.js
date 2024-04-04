@@ -13,13 +13,12 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
       minlength: [3, "Too short product title"],
-      maxlength: [100, "Too long product title"],
     },
 
     description: {
       type: String,
       required: [true, "Product description is required"],
-      minlength: [60, "Too short product description"],
+      minlength: [20, "Too short product description"],
     },
 
     price: {

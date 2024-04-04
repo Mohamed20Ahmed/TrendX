@@ -17,8 +17,8 @@ const createProductValidator = [
   check("description")
     .notEmpty()
     .withMessage("Product description is required")
-    .isLength({ max: 100 })
-    .withMessage("Too long description"),
+    .isLength({ min: 20 })
+    .withMessage("Too short description"),
 
   check("price")
     .notEmpty()
@@ -55,8 +55,8 @@ const updateProductValidator = [
     .optional()
     .notEmpty()
     .withMessage("Product description is required")
-    .isLength({ min: 40 })
-    .withMessage("Too long description"),
+    .isLength({ min: 20 })
+    .withMessage("Too short description"),
 
   check("price")
     .optional()
