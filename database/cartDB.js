@@ -14,23 +14,16 @@ const getCountOfDocument = async (field) => {
 };
 
 const getAllCartDB = async (req) => {
-  // get count of products to use it in pagination results
-  const documentsCounts = await getCountOfDocument({
-    customer: req.query.customerId,
-  });
-
   // apply api features
   const apiFeatures = new ApiFeatures(
     cartModel.find({ customer: req.query.customerId }),
     req.query
-  )
-    .paginate(documentsCounts)
-    .sort();
+  ).sort();
 
-  let { mongooseQuery, paginationResult } = apiFeatures;
-  const cart = await mongooseQuery;
+  let { mongooseQuery } = apiFeatures;
+  const carts = await mongooseQuery;
 
-  return { paginationResult, cart };
+  return { carts };
 };
 
 const addToCartDB = async (data) => {
