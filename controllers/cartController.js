@@ -42,7 +42,9 @@ const getCustomerCart_S = asyncHandler(async (req, res, next) => {
 
   const carts = await getAllCartDB(req);
 
-  const response = { numOfCarts: carts.carts.length, ...carts };
+  const numOfCarts = carts ? carts.carts.length : 0;
+
+  const response = { numOfCarts, ...carts };
 
   sendSuccessResponse(res, response, 200);
 });
