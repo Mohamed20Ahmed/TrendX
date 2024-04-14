@@ -6,6 +6,7 @@ const {
   getCartDB,
   getCartByIdDB,
   getAllCartDB,
+  getCustomerCartsDB,
   addToCartDB,
   deleteCartDB,
 } = require("../database/cartDB");
@@ -21,6 +22,24 @@ const calcTotalCartPrice = (cart) => {
   cart.totalCartPrice = totalPrice;
 
   return totalPrice;
+};
+
+const getNumberOfCartsItems = async (customerId) => {
+  try {
+    let numOfItems = 0;
+
+    const carts = await getCustomerCartsDB(customerId);
+
+    carts.map((cart) => {
+      cart.cartItems.map((cartItem) => {
+        numOfItems += cartItem.quantity;
+      });
+    });
+
+    return numOfItems;
+  } catch (err) {
+    throw err;
+  }
 };
 
 const getCustomerCart_S = asyncHandler(async (req, res, next) => {
@@ -42,9 +61,9 @@ const getCustomerCart_S = asyncHandler(async (req, res, next) => {
 
   const carts = await getAllCartDB(req);
 
-  const numOfCarts = carts ? carts.carts.length : 0;
+  const numOfItems = await getNumberOfCartsItems(req.user._id);
 
-  const response = { numOfCarts, ...carts };
+  const response = { numOfItems, ...carts };
 
   sendSuccessResponse(res, response, 200);
 });
@@ -94,8 +113,11 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
 
   const newCart = await getCartByIdDB(cart._id);
 
+  const numOfItems = await getNumberOfCartsItems(req.user._id);
+
   const response = {
     message: "Product added to cart successfully",
+    numOfItems,
     numOfCartItems: cart.cartItems.length,
     cart: newCart,
   };
@@ -133,7 +155,9 @@ const updateCartItemQuantity = asyncHandler(async (req, res, next) => {
   if (cart.cartItems.length == 0) {
     await deleteCartDB({ _id: cartId });
 
-    const response = { message: "cart deleted" };
+    const numOfItems = await getNumberOfCartsItems(req.user._id);
+
+    const response = { numOfItems, message: "cart deleted" };
 
     return sendSuccessResponse(res, response, 200);
   }
@@ -143,7 +167,13 @@ const updateCartItemQuantity = asyncHandler(async (req, res, next) => {
 
   const newCart = await getCartByIdDB(cart._id);
 
-  const response = { numOfCartItems: cart.cartItems.length, cart: newCart };
+  const numOfItems = await getNumberOfCartsItems(req.user._id);
+
+  const response = {
+    numOfItems,
+    numOfCartItems: cart.cartItems.length,
+    cart: newCart,
+  };
 
   sendSuccessResponse(res, response, 200);
 });
@@ -170,7 +200,9 @@ const removeSpecificCartItem = asyncHandler(async (req, res, next) => {
   if (cart.cartItems.length == 0) {
     await deleteCartDB({ _id: cartId });
 
-    const response = { message: "cart deleted" };
+    const numOfItems = await getNumberOfCartsItems(req.user._id);
+
+    const response = { numOfItems, message: "cart deleted" };
 
     return sendSuccessResponse(res, response, 200);
   }
@@ -180,7 +212,13 @@ const removeSpecificCartItem = asyncHandler(async (req, res, next) => {
 
   const newCart = await getCartByIdDB(cartId);
 
-  const response = { numOfCartItems: cart.cartItems.length, cart: newCart };
+  const numOfItems = await getNumberOfCartsItems(req.user._id);
+
+  const response = {
+    numOfItems,
+    numOfCartItems: cart.cartItems.length,
+    cart: newCart,
+  };
 
   sendSuccessResponse(res, response, 200);
 });
@@ -197,7 +235,9 @@ const clearCart = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const response = { message: "cart deleted successfully" };
+  const numOfItems = await getNumberOfCartsItems(req.user._id);
+
+  const response = { numOfItems, message: "cart deleted successfully" };
 
   sendSuccessResponse(res, response, 200);
 });

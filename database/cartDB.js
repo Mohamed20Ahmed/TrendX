@@ -9,8 +9,8 @@ const getCartByIdDB = async (id, excludedFields = "") => {
   return await cartModel.findById(id).select(excludedFields);
 };
 
-const getCountOfDocument = async (field) => {
-  return await cartModel.find(field).countDocuments();
+const getCustomerCartsDB = async (customerId) => {
+  return await cartModel.find({ customer: customerId });
 };
 
 const getAllCartDB = async (req) => {
@@ -38,6 +38,7 @@ module.exports = {
   getCartDB,
   getCartByIdDB,
   getAllCartDB,
+  getCustomerCartsDB,
   addToCartDB,
   deleteCartDB,
 };
