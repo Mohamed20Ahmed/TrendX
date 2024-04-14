@@ -163,6 +163,19 @@ const getProduct_S = asyncHandler(async (req, res, next) => {
   sendSuccessResponse(res, response, 200);
 });
 
+const imageSearch = asyncHandler(async (req, res, next) => {
+  const productExcludedFields = "-__v";
+
+  // get all  Products
+  req.query.fields = req.query.fields || productExcludedFields;
+
+  const products = await getAllProductsDB(req);
+
+  const response = { ...products };
+
+  sendSuccessResponse(res, response, 200);
+});
+
 const createProduct = asyncHandler(async (req, res, next) => {
   const sellerId = req.user._id;
 

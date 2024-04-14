@@ -47,17 +47,18 @@ class ApiFeatures {
           { name: { $regex: this.queryString.keyword, $options: "i" } },
           { email: { $regex: this.queryString.keyword, $options: "i" } },
         ];
-        
-      }else if(modelName === "products"){
+      } else if (modelName === "products") {
         query.$or = [
           { title: { $regex: this.queryString.keyword, $options: "i" } },
           { description: { $regex: this.queryString.keyword, $options: "i" } },
-        
-        ]
-      }
-       else {
+        ];
+      } else if (modelName === "productImageSearch") {
+        query.$or = [
+          { imageCover: { $regex: this.queryString.keyword, $options: "i" } },
+          { images: { $regex: this.queryString.keyword, $options: "i" } },
+        ];
+      } else {
         query = { title: { $regex: this.queryString.keyword, $options: "i" } };
-        
       }
 
       this.mongooseQuery = this.mongooseQuery.find(query);
