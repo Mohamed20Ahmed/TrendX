@@ -16,9 +16,13 @@ const {
   uploadProductImages,
   updateProduct,
   deleteProduct,
+  imageSearch,
+  uploadImageSearch,
 } = require("../controllers/productController");
 
 router.get("/active", getProductValidator, getActiveProduct_S);
+
+router.get("/active/imageSearch", uploadImageSearch, imageSearch);
 
 router.use(protect);
 

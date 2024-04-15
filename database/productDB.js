@@ -32,15 +32,12 @@ const getAllProductsDB = async (req) => {
   return { paginationResult, products };
 };
 
-const getProductsByImagesDB = async (req) => {
-  // apply api features
-  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
-    .search("products")
-    .limitFields();
+const getProductsByImagesDB = async (imageName) => {
+  const query = {
+    imageCover: { $regex: imageName, $options: "i" },
+  };
 
-  const products = await mongooseQuery;
-
-  return products;
+  return await productModel.findOne(query);
 };
 
 const getSpecificProductsDB = async (req) => {
@@ -82,5 +79,6 @@ module.exports = {
   createProductDB,
   getAllProductsDB,
   getSpecificProductsDB,
+  getProductsByImagesDB,
   getProductDB,
 };

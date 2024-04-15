@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const uuid = require("uuid");
+const axios = require("axios");
+const FormData = require("form-data");
 
 const { getCategoryDB } = require("../database/categoryDB");
 const {
@@ -9,12 +11,18 @@ const {
   createProductDB,
   getAllProductsDB,
   getSpecificProductsDB,
+  getProductsByImagesDB,
   getProductDB,
 } = require("../database/productDB");
-const { uploadMixOfImages } = require("../middlewares/uploadImageMiddleware");
+const {
+  uploadSingleImage,
+  uploadMixOfImages,
+} = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const { addFileStorage } = require("../firebase/storage");
 const ApiError = require("../utils/apiError");
+
+const uploadImageSearch = uploadSingleImage("image");
 
 const uploadProductImages = uploadMixOfImages([
   {
@@ -164,17 +172,41 @@ const getProduct_S = asyncHandler(async (req, res, next) => {
 });
 
 const imageSearch = asyncHandler(async (req, res, next) => {
-  const productExcludedFields = "-__v";
+  if (!req.file) {
+    return next(new ApiError("No image uploaded", 400));
+  }
 
-  // get all  Products
-  req.query.fields = req.query.fields || productExcludedFields;
+  const images = (await forwardImageToFlask(req.file)).data.images;
 
-  const products = await getAllProductsDB(req);
+  let products = [];
 
-  const response = { ...products };
+  await Promise.all(
+    images.map(async (image) => {
+      const product = await getProductsByImagesDB(image);
+
+      if (product && product.seller.active === true) {
+        products.push(product);
+      }
+    })
+  );
+
+  const response = { products };
 
   sendSuccessResponse(res, response, 200);
 });
+
+const forwardImageToFlask = async (file) => {
+  const form = new FormData();
+  form.append("image", file.buffer, file.originalname);
+
+  const response = await axios.post("http://localhost:8000/ImageSearch", form, {
+    headers: {
+      ...form.getHeaders(),
+    },
+  });
+
+  return response;
+};
 
 const createProduct = asyncHandler(async (req, res, next) => {
   const sellerId = req.user._id;
@@ -289,4 +321,6 @@ module.exports = {
   imageStorage,
   updateProduct,
   deleteProduct,
+  imageSearch,
+  uploadImageSearch,
 };

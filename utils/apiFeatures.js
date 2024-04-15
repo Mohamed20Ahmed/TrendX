@@ -52,11 +52,6 @@ class ApiFeatures {
           { title: { $regex: this.queryString.keyword, $options: "i" } },
           { description: { $regex: this.queryString.keyword, $options: "i" } },
         ];
-      } else if (modelName === "productImageSearch") {
-        query.$or = [
-          { imageCover: { $regex: this.queryString.keyword, $options: "i" } },
-          { images: { $regex: this.queryString.keyword, $options: "i" } },
-        ];
       } else {
         query = { title: { $regex: this.queryString.keyword, $options: "i" } };
       }
