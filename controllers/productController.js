@@ -178,14 +178,12 @@ const imageSearch = asyncHandler(async (req, res, next) => {
 
   const images = (await forwardImageToFlask(req.file)).data.images;
 
-  let products = [];
-
-  await Promise.all(
+  const products = await Promise.all(
     images.map(async (image) => {
       const product = await getProductsByImagesDB(image);
 
       if (product && product.seller.active === true) {
-        products.push(product);
+        return product;
       }
     })
   );
