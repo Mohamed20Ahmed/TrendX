@@ -183,8 +183,6 @@ const imageSearch = asyncHandler(async (req, res, next) => {
     images.map(async (image) => {
       const product = await getProductsByImagesDB(image);
       if (product != null && product.seller.active === true) {
-        console.log(product);
-
         return product;
       }
     })
@@ -217,16 +215,20 @@ const getModelResults = async (file) => {
 };
 
 const saveImageInDataSet = async (imageName) => {
-  const form = new FormData();
-  form.append("imageName", imageName);
+  try {
+    const form = new FormData();
+    form.append("imageName", imageName);
 
-  const response = await axios.post("http://localhost:8000/SaveImage", form, {
-    headers: {
-      ...form.getHeaders(),
-    },
-  });
+    const response = await axios.post("http://localhost:8000/SaveImage", form, {
+      headers: {
+        ...form.getHeaders(),
+      },
+    });
 
-  return response;
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const createProduct = asyncHandler(async (req, res, next) => {
