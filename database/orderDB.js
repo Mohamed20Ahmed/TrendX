@@ -25,6 +25,13 @@ const getAllOrdersDB = async (req) => {
   return { paginationResult, orders };
 };
 
+
+
+const getOrdersDB = async (query) => {
+
+  return await orderModel.find(query);
+};
+
 const createOrderDB = async (data) => {
   return await orderModel.create(data);
 };
@@ -33,4 +40,5 @@ module.exports = {
   getOrderByIdDB,
   getAllOrdersDB,
   createOrderDB,
+  getOrdersDB
 };
