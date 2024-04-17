@@ -4,6 +4,7 @@ const {
   getOrder_S,
   createCashOrder,
   updateOrderStatus,
+  predictRevenue
 } = require("../controllers/orderController");
 const {
   updateOrderStatusValidator,
@@ -19,6 +20,7 @@ router
   .post(allowedTo("customer"), validateCartId, createCashOrder);
 
 router.get("/", allowedTo("customer", "seller", "admin"), getOrder_S);
+router.get("/predictRevenue", allowedTo( "seller"), predictRevenue);
 router.patch(
   "/status/:orderId",
   allowedTo("seller"),

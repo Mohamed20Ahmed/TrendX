@@ -1,4 +1,5 @@
 const asyncHandler = require("express-async-handler");
+const axios = require('axios');
 
 const ApiError = require("../utils/apiError");
 const { sendSuccessResponse } = require("../utils/responseHandler");
@@ -12,6 +13,7 @@ const {
   getOrderByIdDB,
   getAllOrdersDB,
   createOrderDB,
+  getOrdersDB
 } = require("../database/orderDB");
 const Cart = require("../models/cartModel");
 
@@ -117,9 +119,74 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
 
 
 
+const predictRevenue = asyncHandler(async (req, res, next) => {
+  
+  
+  const endOfYear =new Date()
+  const startOfYear =new Date()
+  startOfYear.setMonth(endOfYear.getMonth()-11)
+
+  let features=
+  {
+     m1: 0,
+     m2: 0,
+     m3: 0,
+     m4: 0,
+     m5: 0,
+     m6: 0,
+     m7: 0,
+     m8: 0,
+     m9: 0,
+     m10: 0,
+     m11: 0,
+     m12: 0
+ }
+
+
+      const orders = await getOrdersDB({seller: req.user._id, status:"delivered" } );
+      let date = startOfYear
+
+      for(let i=1; i<=12; i++){
+        orders.map((order)=>{
+          if(order.updatedAt.getMonth()==date.getMonth()&&order.updatedAt.getYear()==date.getYear())
+          {
+            features[`m${i}`]+= order.totalOrderPrice
+          }
+        }
+        )
+        date.setMonth(date.getMonth()+1)
+      }
+      const salesRevenue = (await forwardSalesToFlask(features)).data;
+
+    const response={salesRevenue}
+
+      sendSuccessResponse(res, response, 200);
+    })
+  
+
+    const forwardSalesToFlask = async (data) => {
+      try {
+          const response = await axios.post("http://localhost:9000/revenue", data, {
+              headers: {
+                  'Content-Type': 'application/octet-stream', // Set the content type to indicate raw binary data
+              },
+          });
+  
+          return response;
+      } catch (error) {
+          console.error('Error forwarding sales to Flask:', error);
+          throw error;
+      }
+  };
+  
+
+
+
+
 
 module.exports = {
   getOrder_S,
   createCashOrder,
   updateOrderStatus,
+  predictRevenue
 };
