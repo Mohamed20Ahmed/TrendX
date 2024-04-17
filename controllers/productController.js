@@ -196,16 +196,24 @@ const imageSearch = asyncHandler(async (req, res, next) => {
 });
 
 const getModelResults = async (file) => {
-  const form = new FormData();
-  form.append("image", file.buffer, file.originalname);
+  try {
+    const form = new FormData();
+    form.append("image", file.buffer, file.originalname);
 
-  const response = await axios.post("http://localhost:8000/ImageSearch", form, {
-    headers: {
-      ...form.getHeaders(),
-    },
-  });
+    const response = await axios.post(
+      "http://localhost:8000/ImageSearch",
+      form,
+      {
+        headers: {
+          ...form.getHeaders(),
+        },
+      }
+    );
 
-  return response;
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const saveImageInDataSet = async (imageName) => {
