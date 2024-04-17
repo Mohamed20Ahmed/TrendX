@@ -48,6 +48,7 @@ const imageStorage = asyncHandler(async (req, res, next) => {
 
       // Save image into our storage
       req.body.imageCover = await addFileStorage(data);
+      saveImageInDataSet(fileName);
     }
 
     if (req.files.images) {
@@ -176,13 +177,14 @@ const imageSearch = asyncHandler(async (req, res, next) => {
     return next(new ApiError("No image uploaded", 400));
   }
 
-  const images = (await forwardImageToFlask(req.file)).data.images;
+  const images = (await getModelResults(req.file)).data.images;
 
   const products = await Promise.all(
     images.map(async (image) => {
       const product = await getProductsByImagesDB(image);
+      if (product != null && product.seller.active === true) {
+        console.log(product);
 
-      if (product && product.seller.active === true) {
         return product;
       }
     })
@@ -193,11 +195,24 @@ const imageSearch = asyncHandler(async (req, res, next) => {
   sendSuccessResponse(res, response, 200);
 });
 
-const forwardImageToFlask = async (file) => {
+const getModelResults = async (file) => {
   const form = new FormData();
   form.append("image", file.buffer, file.originalname);
 
   const response = await axios.post("http://localhost:8000/ImageSearch", form, {
+    headers: {
+      ...form.getHeaders(),
+    },
+  });
+
+  return response;
+};
+
+const saveImageInDataSet = async (imageName) => {
+  const form = new FormData();
+  form.append("imageName", imageName);
+
+  const response = await axios.post("http://localhost:8000/SaveImage", form, {
     headers: {
       ...form.getHeaders(),
     },
