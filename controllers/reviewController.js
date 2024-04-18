@@ -30,7 +30,7 @@ const getReview_S = asyncHandler(async (req, res, next) => {
     const product = await getProductByIdDB(review.product);
 
     if (!product || product.seller.active === false) {
-      return next(new ApiError("Product not found"));
+      return next(new ApiError("Product not found"), 404);
     }
 
     return sendSuccessResponse(res, { review }, 200);
@@ -59,8 +59,8 @@ const getReview_S = asyncHandler(async (req, res, next) => {
 
 const createReview = asyncHandler(async (req, res, next) => {
   const customerId = req.user._id;
-
-  const { title, rating, productId } = req.body;
+  const productId = req.params.productId;
+  const { title, rating } = req.body;
 
   const product = await getProductByIdDB(productId);
 

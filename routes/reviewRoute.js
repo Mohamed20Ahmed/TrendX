@@ -18,7 +18,12 @@ router.get("/", getReviewValidator, getReview_S);
 
 router.use(protect);
 
-router.post("/", allowedTo("customer"), createReviewValidator, createReview);
+router.post(
+  "/:productId",
+  allowedTo("customer"),
+  createReviewValidator,
+  createReview
+);
 
 router
   .route("/:reviewId")

@@ -23,7 +23,7 @@ const createReviewValidator = [
     .isInt({ min: 1, max: 5 })
     .custom((value) => typeof value === "number"),
 
-  body("productId").isMongoId().withMessage("Invalid product id format"),
+  param("productId").isMongoId().withMessage("Invalid product id format"),
 
   validatorMiddleware,
 ];
