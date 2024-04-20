@@ -48,28 +48,29 @@ const imageStorage = asyncHandler(async (req, res, next) => {
 
       // Save image into our storage
       req.body.imageCover = await addFileStorage(data);
+
+      // Save image into image search model
       saveImageInDataSet(fileName);
     }
 
     if (req.files.images) {
       req.body.images = [];
+
       await Promise.all(
         req.files.images.map(async (img, index) => {
-          let imageName = `product-${uuid.v4()}-${Date.now()}-${
-            index + 1
-          }.jpeg`;
+          let fileName = `product-${uuid.v4()}-${Date.now()}-${index + 1}.jpeg`;
 
-          const data = {
-            imageName,
+          let data = {
+            fileName,
             buffer: img.buffer,
             mimetype: "image/jpeg",
             folderName: "Products",
           };
-
           // Save image into our storage
-          imageName = await addFileStorage(data);
+          fileName = await addFileStorage(data);
+
           // Save image into our db
-          req.body.images.push(imageName);
+          req.body.images.push(fileName);
         })
       );
     }
