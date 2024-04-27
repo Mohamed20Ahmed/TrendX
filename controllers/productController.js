@@ -180,7 +180,7 @@ const imageSearch = asyncHandler(async (req, res, next) => {
 
   const images = (await getModelResults(req.file)).data.images;
 
-  const products = await Promise.all(
+  let products = await Promise.all(
     images.map(async (image) => {
       const product = await getProductsByImagesDB(image);
       if (product != null && product.seller.active === true) {
@@ -188,6 +188,8 @@ const imageSearch = asyncHandler(async (req, res, next) => {
       }
     })
   );
+
+  products = products.filter((product) => product);
 
   const response = { products };
 
