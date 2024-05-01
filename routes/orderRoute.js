@@ -4,11 +4,13 @@ const {
   getOrder_S,
   createCashOrder,
   updateOrderStatus,
-  predictRevenue
+  predictRevenue,
+  GetActualTotalSales,
 } = require("../controllers/orderController");
 const {
   updateOrderStatusValidator,
   validateCartId,
+  actualSalesValidator,
 } = require("../validators/orderValidator");
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
 
@@ -20,7 +22,14 @@ router
   .post(allowedTo("customer"), validateCartId, createCashOrder);
 
 router.get("/", allowedTo("customer", "seller", "admin"), getOrder_S);
-router.get("/predictRevenue", allowedTo( "seller"), predictRevenue);
+router.get("/predictRevenue", allowedTo("seller"), predictRevenue);
+router.get(
+  "/actualSales",
+  allowedTo("seller"),
+  actualSalesValidator,
+  GetActualTotalSales
+);
+
 router.patch(
   "/status/:orderId",
   allowedTo("seller"),

@@ -18,4 +18,20 @@ const validateCartId = [
   validatorMiddleware,
 ];
 
-module.exports = { updateOrderStatusValidator, validateCartId };
+const actualSalesValidator = [
+  body("period")
+    .notEmpty()
+    .withMessage("Please enter period")
+    .isIn(["lastYear", "lastMonth", "lastWeek", "lastDay"])
+    .withMessage(
+      "period must be one of: lastYear, lastMonth, lastWeek, lastDay"
+    ),
+
+  validatorMiddleware,
+];
+
+module.exports = {
+  updateOrderStatusValidator,
+  validateCartId,
+  actualSalesValidator,
+};

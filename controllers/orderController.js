@@ -165,7 +165,42 @@ const updateCartProductsQuantity = async (cart) => {
   );
 };
 
-const predictRevenue = asyncHandler(async (req, res, next) => {
+const GetActualTotalSales = asyncHandler(async (req, res) => {
+  const { period } = req.body;
+  let sum = 0;
+  let date;
+  if (period == "lastYear") {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    date = oneYearAgo;
+  } else if (period == "lastMonth") {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    date = oneMonthAgo;
+  } else if (period == "lastWeek") {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    date = oneWeekAgo;
+  } else {
+    const oneDayAgo = new Date();
+    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+    date = oneDayAgo;
+  }
+  const totalOrders = await getOrdersDB({
+    seller: req.user._id,
+    status: "delivered",
+    createdAt: {
+      $gte: date,
+    },
+  });
+
+  totalOrders.map((order) => {
+    sum += order.totalOrderPrice;
+  });
+  sendSuccessResponse(res, { totalSales: sum }, 200);
+});
+
+const predictRevenue = asyncHandler(async (req, res) => {
   const endOfYear = new Date();
   const startOfYear = new Date();
   startOfYear.setMonth(endOfYear.getMonth() - 11);
@@ -228,4 +263,5 @@ module.exports = {
   createCashOrder,
   updateOrderStatus,
   predictRevenue,
+  GetActualTotalSales,
 };
