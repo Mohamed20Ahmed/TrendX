@@ -84,7 +84,7 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
   });
 
   if (!cart) {
-    if (product.quantity >= 1) {
+    if (product.quantity < 1) {
       return next(new ApiError("quantity not available", 400));
     }
 
@@ -102,14 +102,16 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
 
     if (productIndex > -1) {
       const cartItem = cart.cartItems[productIndex];
+
       cartItem.quantity += 1;
+
       if (cartItem.quantity > product.quantity) {
         return next(new ApiError("quantity not available", 400));
       }
 
       cart.cartItems[productIndex] = cartItem;
     } else {
-      if (product.quantity >= 1) {
+      if (product.quantity < 1) {
         return next(new ApiError("quantity not available", 400));
       }
       // product not exist in cart,  push product to cartItems array
@@ -180,6 +182,7 @@ const updateCartItemQuantity = asyncHandler(async (req, res, next) => {
   }
 
   calcTotalCartPrice(cart);
+
   await cart.save();
 
   const newCart = await getCartByIdDB(cart._id);

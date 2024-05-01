@@ -60,7 +60,7 @@ orderSchema.pre(/^find/, function (next) {
   })
     .populate({
       path: "cartItems.product",
-      select: "title imageCover sellerId ",
+      select: "title imageCover sellerId quantity",
     })
     .populate({
       path: "seller",

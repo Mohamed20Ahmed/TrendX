@@ -6,6 +6,7 @@ const { sendSuccessResponse } = require("../utils/responseHandler");
 const Product = require("../models/productModel");
 const {
   getProductByIdDB,
+  updateProductDB,
   productBulkWriteDB,
 } = require("../database/productDB");
 const { getCartByIdDB, deleteCartDB } = require("../database/cartDB");
@@ -64,12 +65,14 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
 
 const checkCart = async (cart) => {
   const flag = true;
+
   cart.cartItems.map((item) => {
-    if (item.product.quantity < item.quantity) {
+    if (item.product && item.product.quantity < item.quantity) {
       flag = false;
       return;
     }
   });
+
   return flag;
 };
 
@@ -116,7 +119,9 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
       )
     );
   }
+
   const { status, shippingPrice } = req.body;
+
   const oldStatus = order.status;
 
   if (
@@ -129,6 +134,14 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
     );
   }
 
+  if (status == "accepted") {
+    if (!checkCart(order)) {
+      return next(new ApiError("quantity not available", 400));
+    }
+
+    await updateCartProductsQuantity(order);
+  }
+
   order.status = status;
 
   order.shippingPrice = shippingPrice;
@@ -139,6 +152,18 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
 
   sendSuccessResponse(res, updatedOrder, 201);
 });
+
+const updateCartProductsQuantity = async (cart) => {
+  await Promise.all(
+    cart.cartItems.map(async (item) => {
+      if (item.product) {
+        await updateProductDB(item.product._id, {
+          quantity: item.product.quantity - item.quantity,
+        });
+      }
+    })
+  );
+};
 
 const predictRevenue = asyncHandler(async (req, res, next) => {
   const endOfYear = new Date();
