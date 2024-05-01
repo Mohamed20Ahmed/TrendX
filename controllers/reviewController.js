@@ -9,6 +9,7 @@ const {
   deleteReviewDB,
 } = require("../database/reviewDB");
 const { getProductByIdDB } = require("../database/productDB");
+const { getOrdersDB } = require("../database/orderDB");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const ApiError = require("../utils/apiError");
 
@@ -65,7 +66,13 @@ const createReview = asyncHandler(async (req, res, next) => {
   const product = await getProductByIdDB(productId);
 
   if (!product || product.seller.active === false) {
-    return next(new ApiError("Product not found"));
+    return next(new ApiError("Product not found", 404));
+  }
+
+  const pastOrders = await checkOrders(productId, customerId);
+
+  if (!pastOrders) {
+    return next(new ApiError("You aren't allowed to make review", 400));
   }
 
   const oldReview = await getReviewDB({
@@ -194,6 +201,20 @@ const deleteReview = asyncHandler(async (req, res, next) => {
 
   sendSuccessResponse(res, response, 200);
 });
+
+const checkOrders = async (productId, customerId) => {
+  const pastOrders = await getOrdersDB({
+    customer: customerId,
+    cartItems: {
+      $elemMatch: {
+        product: productId,
+      },
+    },
+    status: "delivered",
+  });
+
+  return pastOrders.length ? true : false;
+};
 
 module.exports = {
   getReview_S,
