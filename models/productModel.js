@@ -27,6 +27,10 @@ const productSchema = new mongoose.Schema(
       trim: true,
       max: [200000, "Too long product price"],
     },
+    quantity: {
+      type: Number,
+      required: [true, "Product quantity is required"],
+    },
     sold: {
       type: Number,
       default: 0,
@@ -60,7 +64,7 @@ const productSchema = new mongoose.Schema(
 productSchema.pre(/^find/, function (next) {
   this.populate({ path: "seller", select: "shopName active" }).populate({
     path: "category",
-    select: "name",
+    select: "name image",
   });
 
   next();

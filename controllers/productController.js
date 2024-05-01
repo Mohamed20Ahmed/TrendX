@@ -237,7 +237,8 @@ const saveImageInDataSet = async (imageName) => {
 const createProduct = asyncHandler(async (req, res, next) => {
   const sellerId = req.user._id;
 
-  const { title, price, description, images, imageCover, category } = req.body;
+  const { title, price, quantity, description, images, imageCover, category } =
+    req.body;
 
   const product = await getProductDB({ seller: sellerId, title });
 
@@ -255,6 +256,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
     seller: sellerId,
     title,
     price,
+    quantity,
     description,
     images,
     imageCover,
@@ -277,7 +279,8 @@ const updateProduct = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Product not exists"));
   }
 
-  let { title, price, description, images, imageCover, category } = req.body;
+  let { title, price, quantity, description, images, imageCover, category } =
+    req.body;
 
   if (title) {
     const product = await getProductDB({ seller: sellerId, title });
@@ -303,6 +306,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
     {
       title,
       price,
+      quantity,
       description,
       images,
       imageCover,

@@ -9,13 +9,13 @@ const {
   productBulkWriteDB,
 } = require("../database/productDB");
 const { getCartByIdDB, deleteCartDB } = require("../database/cartDB");
+
 const {
   getOrderByIdDB,
   getAllOrdersDB,
   createOrderDB,
   getOrdersDB,
 } = require("../database/orderDB");
-const Cart = require("../models/cartModel");
 
 const createCashOrder = asyncHandler(async (req, res, next) => {
   const cart = await getCartByIdDB(req.params.cartId);
@@ -26,7 +26,7 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
     return next(new ApiError("cart not found", 404));
   }
 
-  if (cart.seller.active === false) {
+  if (cart.seller.active === false || !checkCart(cart)) {
     return next(new ApiError("cannot proceed this order", 404));
   }
 
@@ -61,6 +61,17 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
 
   return sendSuccessResponse(res, { order }, 201);
 });
+
+const checkCart = async (cart) => {
+  const flag = true;
+  cart.cartItems.map((item) => {
+    if (item.product.quantity < item.quantity) {
+      flag = false;
+      return;
+    }
+  });
+  return flag;
+};
 
 const getOrder_S = asyncHandler(async (req, res, next) => {
   const orderExcludedFields = "-__v";
@@ -105,10 +116,22 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
       )
     );
   }
+  const { status, shippingPrice } = req.body;
+  const oldStatus = order.status;
 
-  order.status = req.body.status;
+  if (
+    ((status == "accepted" || status == "canceled") &&
+      oldStatus != "pending") ||
+    (status == "delivered" && oldStatus != "accepted")
+  ) {
+    return next(
+      new ApiError(`can't change status from ${oldStatus} to ${status}`, 400)
+    );
+  }
 
-  order.shippingPrice = req.body.shippingPrice;
+  order.status = status;
+
+  order.shippingPrice = shippingPrice;
 
   order.changeStatusTime = Date.now();
 

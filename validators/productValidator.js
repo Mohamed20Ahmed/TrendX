@@ -26,6 +26,12 @@ const createProductValidator = [
     .isFloat({ min: 0, max: 200000 })
     .withMessage("Product price must be a number between 0->200000"),
 
+  check("quantity")
+    .notEmpty()
+    .withMessage("Product quantity is required")
+    .isInt({ min: 0 })
+    .custom((value) => typeof value === "number"),
+
   check("imageCover").notEmpty().withMessage("Product imageCover is required"),
 
   check("images")
@@ -64,6 +70,12 @@ const updateProductValidator = [
     .withMessage("Product price is required")
     .isFloat({ min: 0, max: 200000 })
     .withMessage("Product price must be a number between 0->200000"),
+
+  check("quantity")
+    .notEmpty()
+    .withMessage("Product quantity is required")
+    .isInt({ min: 0 })
+    .custom((value) => typeof value === "number"),
 
   check("imageCover")
     .optional()

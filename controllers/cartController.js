@@ -84,6 +84,10 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
   });
 
   if (!cart) {
+    if (product.quantity >= 1) {
+      return next(new ApiError("quantity not available", 400));
+    }
+
     // create cart fot logged user with product
     cart = await addToCartDB({
       customer: req.user._id,
@@ -99,9 +103,15 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
     if (productIndex > -1) {
       const cartItem = cart.cartItems[productIndex];
       cartItem.quantity += 1;
+      if (cartItem.quantity > product.quantity) {
+        return next(new ApiError("quantity not available", 400));
+      }
 
       cart.cartItems[productIndex] = cartItem;
     } else {
+      if (product.quantity >= 1) {
+        return next(new ApiError("quantity not available", 400));
+      }
       // product not exist in cart,  push product to cartItems array
       cart.cartItems.push({ product: productId, price: product.price });
     }
@@ -140,13 +150,20 @@ const updateCartItemQuantity = asyncHandler(async (req, res, next) => {
 
   if (itemIndex > -1) {
     const cartItem = cart.cartItems[itemIndex];
-
     type == "-" ? cartItem.quantity-- : cartItem.quantity++;
 
-    if (cartItem.quantity == 0) {
+    if (!cartItem.product) {
       cart.cartItems.splice(itemIndex, 1);
     } else {
-      cart.cartItems[itemIndex] = cartItem;
+      if (cartItem.quantity > cartItem.product.quantity) {
+        return next(new ApiError("quantity not available", 400));
+      }
+
+      if (cartItem.quantity == 0) {
+        cart.cartItems.splice(itemIndex, 1);
+      } else {
+        cart.cartItems[itemIndex] = cartItem;
+      }
     }
   } else {
     return next(new ApiError(`there is no item for this id :${itemId}`, 404));

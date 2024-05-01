@@ -36,7 +36,7 @@ const cartSchema = new mongoose.Schema(
 cartSchema.pre(/^find/, function (next) {
   this.populate({
     path: "cartItems.product",
-    select: "title imageCover category",
+    select: "title imageCover category quantity",
   }).populate({ path: "seller", select: "shopName shopImage active" });
 
   next();
