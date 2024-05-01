@@ -63,8 +63,8 @@ const createCashOrder = asyncHandler(async (req, res, next) => {
   return sendSuccessResponse(res, { order }, 201);
 });
 
-const checkCart = async (cart) => {
-  const flag = true;
+const checkCart = (cart) => {
+  let flag = true;
 
   cart.cartItems.map((item) => {
     if (item.product && item.product.quantity < item.quantity) {
@@ -109,7 +109,7 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
 
   const user = req.user;
 
-  const order = await getOrderByIdDB(req.params.orderId, orderExcludedFields);
+  let order = await getOrderByIdDB(req.params.orderId, orderExcludedFields);
 
   if (!order || order[user.role]._id.toString() !== user._id.toString()) {
     return next(

@@ -57,8 +57,8 @@ const imageStorage = asyncHandler(async (req, res, next) => {
       req.body.images = [];
 
       await Promise.all(
-        req.files.images.map(async (img, index) => {
-          let fileName = `product-${uuid.v4()}-${Date.now()}-${index + 1}.jpeg`;
+        req.files.images.map(async (img) => {
+          let fileName = `product-${uuid.v4()}-${Date.now()}.jpeg`;
 
           let data = {
             fileName,
