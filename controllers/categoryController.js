@@ -1,9 +1,9 @@
 const uuid = require("uuid");
+const sharp = require("sharp");
 const asyncHandler = require("express-async-handler");
 
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
-const { addFileStorage } = require("../firebase/storage");
 const ApiError = require("../utils/apiError");
 const {
   getCategoryByIdDB,
@@ -21,15 +21,14 @@ const imageStorage = asyncHandler(async (req, res, next) => {
   const fileName = `category-${uuid.v4()}-${Date.now()}.jpeg`;
 
   if (req.file) {
-    const data = {
-      fileName,
-      buffer: req.file.buffer,
-      mimetype: "image/jpeg",
-      folderName: "Categories",
-    };
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`uploads/categories/${fileName}`);
 
-    // Save image into our storage
-    req.body.image = await addFileStorage(data);
+    // Save image into our db
+    req.body.image = fileName;
   }
 
   next();

@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const uuid = require("uuid");
+const sharp = require("sharp");
 const axios = require("axios");
 const FormData = require("form-data");
 
@@ -19,7 +20,6 @@ const {
   uploadMixOfImages,
 } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
-const { addFileStorage } = require("../firebase/storage");
 const ApiError = require("../utils/apiError");
 
 const uploadImageSearch = uploadSingleImage("image");
@@ -38,19 +38,18 @@ const uploadProductImages = uploadMixOfImages([
 const imageStorage = asyncHandler(async (req, res, next) => {
   if (req.files) {
     if (req.files.imageCover) {
-      const fileName = `product-${uuid.v4()}-${Date.now()}.jpeg`;
-      const data = {
-        fileName,
-        buffer: req.files.imageCover[0].buffer,
-        mimetype: "image/jpeg",
-        folderName: "Products",
-      };
+      const imageCoverFileName = `product-${uuid.v4()}-${Date.now()}.jpeg`;
 
-      // Save image into our storage
-      req.body.imageCover = await addFileStorage(data);
+      await sharp(req.files.imageCover[0].buffer)
+        .resize(2000, 1333)
+        .toFormat("jpeg")
+        .jpeg({ quality: 95 })
+        .toFile(`uploads/products/${imageCoverFileName}`);
+
+      req.body.imageCover = imageCoverFileName;
 
       // Save image into image search model
-      saveImageInDataSet(fileName);
+      saveImageInDataSet(imageCoverFileName);
     }
 
     if (req.files.images) {
@@ -58,19 +57,18 @@ const imageStorage = asyncHandler(async (req, res, next) => {
 
       await Promise.all(
         req.files.images.map(async (img) => {
-          let fileName = `product-${uuid.v4()}-${Date.now()}.jpeg`;
+          let imageName = `product-${uuid.v4()}-${Date.now()}-${
+            index + 1
+          }.jpeg`;
 
-          let data = {
-            fileName,
-            buffer: img.buffer,
-            mimetype: "image/jpeg",
-            folderName: "Products",
-          };
-          // Save image into our storage
-          fileName = await addFileStorage(data);
+          await sharp(img.buffer)
+            .resize(2000, 1333)
+            .toFormat("jpeg")
+            .jpeg({ quality: 95 })
+            .toFile(`uploads/products/${imageName}`);
 
           // Save image into our db
-          req.body.images.push(fileName);
+          req.body.images.push(imageName);
         })
       );
     }
@@ -256,7 +254,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
     seller: sellerId,
     title,
     price,
-    quantity,
+    quantity: +quantity,
     description,
     images,
     imageCover,
@@ -306,7 +304,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
     {
       title,
       price,
-      quantity,
+      quantity: +quantity,
       description,
       images,
       imageCover,

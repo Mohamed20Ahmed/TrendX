@@ -1,4 +1,5 @@
 const asyncHandler = require("express-async-handler");
+const sharp = require("sharp");
 const uuid = require("uuid");
 
 const {
@@ -7,7 +8,6 @@ const {
   getUsersByRoleDB,
   updateUserDB,
 } = require("../database/userDB");
-const { addFileStorage } = require("../firebase/storage");
 const { hash, compare } = require("../utils/bcryptService");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const { sendSuccessResponse } = require("../utils/responseHandler");
@@ -21,15 +21,14 @@ const imageStorage = asyncHandler(async (req, res, next) => {
   const fileName = `shop-${uuid.v4()}-${Date.now()}.jpeg`;
 
   if (req.file) {
-    const data = {
-      fileName,
-      buffer: req.file.buffer,
-      mimetype: "image/jpeg",
-      folderName: "Shops",
-    };
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`uploads/shops/${fileName}`);
 
-    // Save image into our storage
-    req.body.shopImage = await addFileStorage(data);
+    // Save image into our db
+    req.body.shopImage = fileName;
   }
 
   next();

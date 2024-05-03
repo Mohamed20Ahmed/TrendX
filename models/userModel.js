@@ -38,13 +38,6 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
-    // wishlist: [
-    //   {
-    //     type: mongoose.Schema.ObjectId,
-    //     ref: 'Product',
-    //   },
-    // ],
-
     address: {
       street: String,
       city: String,
@@ -61,6 +54,22 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+const setImageURL = (doc) => {
+  if (doc.shopImage) {
+    const imageUrl = `${process.env.BASE_URL}/shops/${doc.shopImage}`;
+    doc.shopImage = imageUrl;
+  }
+};
+// findOne, findAll and update
+userSchema.post("init", (doc) => {
+  setImageURL(doc);
+});
+
+// create
+userSchema.post("save", (doc) => {
+  setImageURL(doc);
+});
 
 const userModel = mongoose.model("User", userSchema);
 

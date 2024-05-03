@@ -30,7 +30,7 @@ const createProductValidator = [
     .notEmpty()
     .withMessage("Product quantity is required")
     .isInt({ min: 0 })
-    .custom((value) => typeof value === "number"),
+    .withMessage("Product quantity must be a number"),
 
   check("imageCover").notEmpty().withMessage("Product imageCover is required"),
 
@@ -75,7 +75,7 @@ const updateProductValidator = [
     .notEmpty()
     .withMessage("Product quantity is required")
     .isInt({ min: 0 })
-    .custom((value) => typeof value === "number"),
+    .withMessage("Product quantity must be a number"),
 
   check("imageCover")
     .optional()
