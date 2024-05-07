@@ -24,7 +24,7 @@ router
 router.get("/", allowedTo("customer", "seller", "admin"), getOrder_S);
 router.get("/predictRevenue", allowedTo("seller"), predictRevenue);
 router.post(
-  "/actualSales",
+  "/sales/actual",
   allowedTo("seller"),
   actualSalesValidator,
   GetActualTotalSales
