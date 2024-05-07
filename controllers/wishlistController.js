@@ -35,9 +35,11 @@ const addProductToWishlist = asyncHandler(async (req, res, next) => {
       wishlist: [{ product }],
     });
   } else {
-    const productIndex = wishlist.wishlist.findIndex(
-      (item) => item.product._id.toString() === product._id.toString()
-    );
+    const productIndex = wishlist.wishlist.findIndex((item) => {
+      if (item.product) {
+        return item.product._id.toString() === product._id.toString();
+      }
+    });
 
     if (productIndex > -1) {
       return next(new ApiError("product is already exist", 400));
