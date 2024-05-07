@@ -8,9 +8,9 @@ const getShop_S = asyncHandler(async (req, res, next) => {
   const sellerIncludedFields = "_id shopName shopAddress shopImage";
   // get specific seller
 
-  if (req.query.shopName) {
+  if (req.query.shopId) {
     const shop = await getUserDB(
-      { shopName: req.query.shopName, role: "seller", active: true },
+      { _id: req.query.shopId, role: "seller", active: true },
       sellerIncludedFields
     );
 
