@@ -13,10 +13,6 @@ const dbConnection = require("./database/dbConfig");
 const mountRoutes = require("./routes");
 const errorMiddleware = require("./middlewares/errorMiddleware");
 
-
-
-
-
 // Database connection
 dbConnection();
 
@@ -38,11 +34,6 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-
-
-
-
-
 // Routes
 mountRoutes(app);
 
@@ -54,6 +45,7 @@ const port = process.env.PORT || 5000;
 const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
 
 // Handle rejected requests outside express server
 process.on("unhandledRejection", (err) => {

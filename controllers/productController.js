@@ -200,7 +200,7 @@ const getModelResults = async (file) => {
     form.append("image", file.buffer, file.originalname);
 
     const response = await axios.post(
-      "http://localhost:3500/ImageSearch",
+      "http://127.0.0.1:3500/ImageSearch",
       form,
       {
         headers: {
@@ -220,7 +220,7 @@ const saveImageInDataSet = async (imageName) => {
     const form = new FormData();
     form.append("imageName", imageName);
 
-    const response = await axios.post("http://localhost:3500/SaveImage", form, {
+    const response = await axios.post("http://127.0.0.1:3500/SaveImage", form, {
       headers: {
         ...form.getHeaders(),
       },
