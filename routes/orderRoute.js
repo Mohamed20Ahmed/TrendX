@@ -23,7 +23,7 @@ router
 
 router.get("/", allowedTo("customer", "seller", "admin"), getOrder_S);
 router.get("/predictRevenue", allowedTo("seller"), predictRevenue);
-router.get(
+router.post(
   "/actualSales",
   allowedTo("seller"),
   actualSalesValidator,
