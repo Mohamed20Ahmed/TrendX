@@ -67,9 +67,11 @@ const removeProductFromWishlist = asyncHandler(async (req, res, next) => {
     // create cart fot logged user with product
     return next(new ApiError("Product not found in wishlist", 404));
   } else {
-    const productIndex = wishlist.wishlist.findIndex(
-      (item) => item.product._id.toString() === product
-    );
+    const productIndex = wishlist.wishlist.findIndex((item) => {
+      if (item.product) {
+        return item.product._id.toString() === product;
+      }
+    });
 
     if (productIndex > -1) {
       wishlist.wishlist.splice(productIndex, 1);

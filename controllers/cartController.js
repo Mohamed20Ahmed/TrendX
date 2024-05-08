@@ -96,9 +96,11 @@ const addProductToCart = asyncHandler(async (req, res, next) => {
     });
   } else {
     // product exist in cart, update product quantity
-    const productIndex = cart.cartItems.findIndex(
-      (item) => item.product._id.toString() === productId
-    );
+    const productIndex = cart.cartItems.findIndex((item) => {
+      if (item.product) {
+        return item.product._id.toString() === productId;
+      }
+    });
 
     if (productIndex > -1) {
       const cartItem = cart.cartItems[productIndex];
