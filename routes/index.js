@@ -10,6 +10,8 @@ const wishlistRoute = require("./wishlistRoute");
 const categoryRoute = require("./categoryRoute");
 const cartRoute = require("./cartRoute");
 const shopRoute = require("./shopRoute");
+const chatbotRoute = require("./chatbotRoute");
+
 
 const mountRoutes = (app) => {
   app.use("/auth", authRoute);
@@ -21,6 +23,7 @@ const mountRoutes = (app) => {
   app.use("/category", categoryRoute);
   app.use("/carts", cartRoute);
   app.use("/shops", shopRoute);
+  app.use('/api/info', chatbotRoute);
 
   app.get("/", (req, res) => {
     sendSuccessResponse(res, { message: "Hello form server side!" }, 200);

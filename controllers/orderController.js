@@ -246,7 +246,7 @@ const predictRevenue = asyncHandler(async (req, res) => {
 
 const forwardSalesToModel = async (data) => {
   try {
-    const response = await axios.post("http://localhost:9000/revenue", data, {
+    const response = await axios.post("http://127.0.0.1:9000/revenue", data, {
       headers: {
         "Content-Type": "application/octet-stream",
       },
