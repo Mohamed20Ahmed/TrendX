@@ -8,7 +8,7 @@ const {
   updateReviewDB,
   deleteReviewDB,
 } = require("../database/reviewDB");
-const { getProductByIdDB } = require("../database/productDB");
+const { getProductByIdDB, updateProductDB } = require("../database/productDB");
 const { getOrdersDB } = require("../database/orderDB");
 const { sendSuccessResponse } = require("../utils/responseHandler");
 const ApiError = require("../utils/apiError");
@@ -101,7 +101,13 @@ const createReview = asyncHandler(async (req, res, next) => {
   product.ratingsAverage = newRating;
   product.ratingsQuantity++;
 
-  await product.save();
+  await updateProductDB(
+    { _id: product._id },
+    {
+      ratingsAverage: product.ratingsAverage,
+      ratingsQuantity: product.ratingsQuantity,
+    }
+  );
 
   const response = { message: "Review created successfully" };
 
@@ -145,7 +151,12 @@ const updateReview = asyncHandler(async (req, res, next) => {
 
     product.ratingsAverage = newRating;
 
-    await product.save();
+    await updateProductDB(
+      { _id: product._id },
+      {
+        ratingsAverage: product.ratingsAverage,
+      }
+    );
   }
 
   const response = { message: "Review updated successfully" };
@@ -195,7 +206,13 @@ const deleteReview = asyncHandler(async (req, res, next) => {
     product.ratingsAverage = newRating;
   }
 
-  await product.save();
+  await updateProductDB(
+    { _id: product._id },
+    {
+      ratingsAverage: product.ratingsAverage,
+      ratingsQuantity: product.ratingsQuantity,
+    }
+  );
 
   const response = { message: "Review deleted successfully" };
 

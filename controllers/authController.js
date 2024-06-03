@@ -114,7 +114,14 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
 
   user.passwordResetVerified = false;
 
-  await user.save();
+  await updateUserDB(
+    { _id: user._id },
+    {
+      passwordResetCode: user.passwordResetCode,
+      passwordResetExpires: user.passwordResetExpires,
+      passwordResetVerified: user.passwordResetVerified,
+    }
+  );
 
   const message = `Hi ${user.name}, We received a request to reset the password on your TrendX Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The TrendX Team`;
 
@@ -129,7 +136,14 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
     user.passwordResetExpires = undefined;
     user.passwordResetVerified = undefined;
 
-    await user.save();
+    await updateUserDB(
+      { _id: user._id },
+      {
+        passwordResetCode: user.passwordResetCode,
+        passwordResetExpires: user.passwordResetExpires,
+        passwordResetVerified: user.passwordResetVerified,
+      }
+    );
 
     return next(new ApiError("There is an error in sending email", 500));
   }
@@ -156,7 +170,12 @@ const verifyResetCode = asyncHandler(async (req, res, next) => {
 
   user.passwordResetVerified = true;
 
-  await user.save();
+  await updateUserDB(
+    { _id: user._id },
+    {
+      passwordResetVerified: user.passwordResetVerified,
+    }
+  );
 
   const response = { message: "Verified" };
 
@@ -181,7 +200,15 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   user.passwordResetVerified = undefined;
 
-  await user.save();
+  await updateUserDB(
+    { _id: user._id },
+    {
+      password: user.password,
+      passwordResetCode: user.passwordResetCode,
+      passwordResetExpires: user.passwordResetExpires,
+      passwordResetVerified: user.passwordResetVerified,
+    }
+  );
 
   const token = await jwtGenerator({
     email: user.email,
