@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 
-const { getUserDB, createUserDB } = require("../database/userDB");
+const { getUserDB, createUserDB, updateUserDB } = require("../database/userDB");
 const { hash, compare } = require("../utils/bcryptService");
 const { createHash } = require("../utils/cryptoService");
 const { sendEmail } = require("../utils/emailService");
