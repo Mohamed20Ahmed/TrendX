@@ -63,15 +63,10 @@ const websiteInfo = (req, res) => {
         {
           section: "Reviews and Feedback",
           items: [
-            { question: "How do I leave a review for a product I purchased?", answer: "Navigate to the product's review section, write your review, rate the product, and submit. Your feedback helps others make informed decisions." }
+            { question: "How do I leave a review for a product I purchased?", answer: "Navigate to the orders's  section, write your review, rate the product, and submit. Your feedback helps others make informed decisions." }
           ]
         },
-        {
-          section: "Communicating with Sellers",
-          items: [
-            { question: "How do I ask a seller about a product?", answer: "Use the website's messaging system to send your questions directly to the seller. They will respond to your inquiries as soon as possible." }
-          ]
-        },
+
         {
           section: "Managing Products (For Sellers)",
           items: [
