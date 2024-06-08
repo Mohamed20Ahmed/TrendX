@@ -142,8 +142,7 @@ const updateCustomerAccount = asyncHandler(async (req, res, next) => {
 });
 
 const updateSellerAccount = asyncHandler(async (req, res, next) => {
-  const { name, email, phoneNumber, shopName, shopAddress, shopImage } =
-    req.body;
+  const { name, email, phoneNumber, shopName, shopAddress } = req.body;
 
   await uniqueFieldsExistence(
     {
@@ -163,7 +162,6 @@ const updateSellerAccount = asyncHandler(async (req, res, next) => {
       phoneNumber,
       shopName,
       shopAddress,
-      shopImage,
     }
   );
 
